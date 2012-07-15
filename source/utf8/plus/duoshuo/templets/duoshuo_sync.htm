@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>">
+<title>多说评论管理</title>
+<script language="javascript" src="../include/js/jquery/jquery.js"></script>
+<script language="javascript" src="../include/js/dedeajax2.js"></script>
+<link href="css/base.css" rel="stylesheet" type="text/css" />
+</head>
+<body background="images/allbg.gif" leftmargin="8" topmargin="8">
+<table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
+	<tr>
+		<td height="28" background="images/tbg.gif" colspan="8" style="padding-left:10px;">
+			<div style="float:left">
+				<b>多说评论框同步</b>
+			</div>
+		</td>
+	</tr>
+	<tr bgcolor="#FFFFFF" align="center" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+		<td width="20%">立即同步多说评论到本地</td>
+		<form action="duoshuo_admin.php" name="form1" method="get">
+			<input name="action" type="hidden" value="syncCommentsToLocal"/>		
+		<td width="80%"><input type="button" size="12" onclick="document.form1.submit();" style="width:50px" value="同步" /></td>
+		</form>
+		
+	</tr>
+	<!-- <tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+		<td width="10%">通用标签：</td>
+		<td width="90%" colspan="2">如果您之前已经关闭了评论，或想在某一模板里加入评论框，请在页面模板中加入 <b><?php echo $this->tag;?> </b> 
+		[<a style="font-size:13px" target="_blank" href="http://blog.duoshuo.com/help/dedecms-install/duoshuo-tag/"><u>参考文档</u></a>]</td>
+	</tr> -->
+</table>
+</body>
+</html>
