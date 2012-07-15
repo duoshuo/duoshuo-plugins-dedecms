@@ -65,21 +65,18 @@ try{
 		
 		if (isset($input['spam_confirmed']))	//D-Z Theme 会给POST设置这个参数
 			unset($input['spam_confirmed']);
-		Duoshuo::saveConfig('test',2);
+		
 		ksort($input);
 		$baseString = http_build_query($input, null, '&');
 		
 		$secret = Duoshuo::$secret;
 		$expectSignature = base64_encode(hash_hmac('sha1', $baseString, $secret, true));
-		Duoshuo::saveConfig('testsecret', Duoshuo::$secret);
-		Duoshuo::saveConfig('signature',$signature);
-		Duoshuo::saveConfig('expectSignature',$expectSignature);
 		if ($signature !== $expectSignature)
 			throw new Duoshuo_Exception('Invalid signature, expect: ' . $expectSignature . '. (' . $baseString . ')', Duoshuo_Exception::INVALID_SIGNATURE);
 		
 		$server = new DuoshuoLocalServer();
 		$method = $input['action'];
-		Duoshuo::saveConfig('test',$method);
+		
 		if (!method_exists($server, $method))
 			throw new Duoshuo_Exception('Unknown action.', Duoshuo_Exception::OPERATION_NOT_SUPPORTED);
 		
@@ -89,7 +86,4 @@ try{
 }
 catch (Exception $e){
 	Duoshuo::sendException($e);
-	Duoshuo::saveConfig('test',$e->getMessage());
-	Duoshuo::saveConfig('errFile',$e->getFile());
-	Duoshuo::saveConfig('errLine',$e->getLine());
 }
