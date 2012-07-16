@@ -3,10 +3,10 @@
 require_once(dirname(__FILE__)."/../../include/common.inc.php");
 error_reporting(E_ALL);
 ini_set('display_errors',1);
-require_once(DEDEROOT.'/plus/duoshuo/duoshuo.php');
+require_once('duoshuo.php');
 
 if (!extension_loaded('json'))
-	include DEDEROOT.'/plus/duoshuo/compat_json.php';
+	include_once 'compat_json.php';
 
 if (!headers_sent()) {
 	//nocache_headers();//max age TODO:

@@ -53,7 +53,6 @@ if(file_exists($configFile)){
 
 if(empty(Duoshuo::$shortName) || empty(Duoshuo::$secret)){
 	$params = Duoshuo::packageOptions();
-	var_dump('abc');
 	$url = 'http://' . Duoshuo::DOMAIN . '/connect-site/?'. http_build_query($params, null, '&');
 	header("Location:" . $url, true);
 	exit;

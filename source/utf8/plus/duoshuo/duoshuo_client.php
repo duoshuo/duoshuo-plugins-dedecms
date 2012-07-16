@@ -112,7 +112,6 @@ class DuoshuoClient{
 			if (isset($token['refresh_token'])) //	可能没有refresh_token
 				$this->refresh_token = $token['refresh_token'];
 		} else {
-			var_dump($response);var_dump($params);var_dump($token);	// 用来调试
 			throw new Duoshuo_Exception("get access token failed." . $token['error']);
 		}
 		

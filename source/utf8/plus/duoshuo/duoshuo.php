@@ -116,6 +116,12 @@ class Duoshuo{
 	static $seoEnabled = false;
 	
 	/**
+	 * 每篇文章seo显示的最大行数
+	 * @var bool
+	 */
+	static $seoMaxRow = 100;
+	
+	/**
 	 * 
 	 */	
 	static $initialized = false;
@@ -188,55 +194,9 @@ class Duoshuo{
 	 * @return DuoshuoClient
 	 */
 	static function getClient($userId = 0){	//如果不输入参数，就是游客
-		$remoteAuth = null;//self::remoteAuth($userId);
-	
-		/*if ($userId !== null){
-			$accessToken = self::getUserMeta($userId, 'duoshuo_access_token');
-	
-			if (is_string($accessToken))
-				return new DuoshuoClient(self::$shortName, self::$secret, $remoteAuth, $accessToken);
-		}*/
+		$remoteAuth = null;
 		return new DuoshuoClient(self::$shortName, self::$secret, $remoteAuth);
 	}
-	/*
-	static function remoteAuth($userId = null){	// null 代表当前登录用户，0代表游客
-		if ($userId === null)
-			$current_user = wp_get_current_user();
-		elseif($userId != 0)
-		$current_user = get_user_by( 'id', $userId);
-	
-		if (isset($current_user) && $current_user->ID) {
-			$avatar_tag = get_avatar($current_user->ID);
-			$avatar_data = array();
-			preg_match('/(src)=((\'|")[^(\'|")]*(\'|"))/i', $avatar_tag, $avatar_data);
-			$avatar = str_replace(array('"', "'"), '', $avatar_data[2]);
-	
-			$user_data = array(
-					'id' => $current_user->ID
-					'name' => $current_user->display_name,
-					'avatar' => $avatar,
-					'email' => $current_user->user_email,
-			);
-		}
-		else{
-			$user_data = array();
-		}
-		$message = base64_encode(json_encode($user_data));
-		$time = time();
-		return $message . ' ' . self::hmacsha1($message . ' ' . $time, self::$secret) . ' ' . $time;
-	}
-	
-	static function buildQuery(){
-		return array(
-				'short_name'	=>	self::$shortName,
-				'sso'	=>	array(
-						'login'=>	site_url('wp-login.php', 'login') .'?action=duoshuo_login',
-						'logout'=>	htmlspecialchars_decode(wp_logout_url(), ENT_QUOTES),
-				),
-				'remote_auth'	=>	self::remoteAuth(),
-		);
-	}
-	*/
 	
 	static function checkDefaultSettings($adminPath){
 		$duoshuoDefaultSettings = array(
@@ -306,11 +266,16 @@ class Duoshuo{
 		);
 		return $params;
 	}
-	
+
+	/**
+	 * 从服务器pull评论到本地
+	 *
+	 * @param array $posts
+	 */
 	static function syncCommentsToLocal(){
 		$syncLock = self::getConfig('sync_lock');//检查是否正在同步评论 同步完成后该值会置0
 		if(!isset($syncLock) || $syncLock > time()- 900){//正在或15分钟内发生过写回但没置0
-			//return;
+			return;
 		}
 		try{
 			self::saveConfig('sync_lock',  time());
@@ -332,6 +297,7 @@ class Duoshuo{
 			$aidList = array();
 			$max_sync_date = 0;
 			
+			$x = -100;
 			do{
 				$response = $client->request('GET', 'log/list', $params);
 			
@@ -342,10 +308,11 @@ class Duoshuo{
 					$aidList = array_merge(self::_syncCommentsToLocal($response['response']),$aidList);
 					//唯一化
 					$aidList = array_unique($aidList);
-					
-					foreach($response['response'] as $log)
-						if ($log['date'] > $max_sync_date)
+					foreach($response['response'] as $log){
+						if ($log['date'] > $max_sync_date){
 							$max_sync_date = $log['date'];
+						}
+					}
 					$params['since'] = $max_sync_date;
 				}
 			} while ($count == $limit);//如果返回和最大请求条数一致，则再取一次
@@ -353,18 +320,23 @@ class Duoshuo{
 			if ($max_sync_date > $last_sync)
 				self::saveConfig('last_sync', $max_sync_date);
 			
+			self::saveConfig('sync_lock',  0);
+			
 			//更新静态文件
 			if(Duoshuo::$syncToLocal && Duoshuo::$seoEnabled){
 				foreach($aidList as $aid){
+					include_once(Duoshuo::$adminPath."/config.php");
 					$startid = $aid;
 					$endid = $aid;
 					include_once(Duoshuo::$adminPath."/makehtml_archives_action.php");
+					self::saveConfig('aid'.$aid, 'end');
 				}
 			}
 			
-			self::saveConfig('sync_lock',  0);
+			self::saveConfig('sync_lock', 1);
 		}
 		catch(Exception $ex){
+			self::saveConfig('sync_lock', $ex->getLine());
 			//Showmsg($e->getMessage());
 		}
 	}
@@ -377,9 +349,9 @@ class Duoshuo{
 		echo json_encode($response);
 		exit;
 	}
-	
+
 	/**
-	 * 从服务器pull评论到本地
+	 * 将pull回的数据写入本地数据库
 	 *
 	 * @param array $posts
 	 */
@@ -431,7 +403,7 @@ class Duoshuo{
 				case 'spam':
 				case 'delete':
 					foreach($log['meta'] as $postId){
-						$sql = "SELECT title FROM duoshuo_commentmeta WHERE post_id = ".$postId;
+						$sql = "SELECT * FROM duoshuo_commentmeta WHERE post_id = ".$postId;
 						$synced = $dsql->GetOne($sql);
 						if(!is_array($synced)){//非create操作的评论，同步过才处理
 							continue;
@@ -449,7 +421,7 @@ class Duoshuo{
 				case 'delete-forever':
 					$log['meta'] = json_decode($log['meta'],false);
 					foreach($log['meta'] as $postId){
-						$sql = "SELECT title FROM duoshuo_commentmeta WHERE post_id = ".$postId;
+						$sql = "SELECT * FROM duoshuo_commentmeta WHERE post_id = ".$postId;
 						$synced = $dsql->GetOne($sql);
 						if(!is_array($synced)){//非create操作的评论，同步过才处理
 							continue;
