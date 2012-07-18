@@ -6,14 +6,14 @@
  *
  */
 class DuoshuoClient{
-	var $end_point = 'http://duoshuo.com/api/';
+	var $end_point = 'http://api.duoshuo.com/';
 	/**
 	 * 返回值格式
 	 * @var string
 	 */
 	var $format = 'json';
 	
-	var $userAgent = 'DuoshuoClient PHP v0.2';
+	var $userAgent = 'DuoshuoSDK/0.2.0';
 	
 	var $connecttimeout = 30;
 	var $timeout = 30;
@@ -29,6 +29,10 @@ class DuoshuoClient{
 		$this->accessToken = $accessToken;
 	}
 	
+	function getLogList($params){
+		$this->request('GET', 'log/list', $params);
+	}
+	
 	/**
 	 * 
 	 * @param $method
@@ -38,12 +42,12 @@ class DuoshuoClient{
 	 * @return array
 	 */
 	function request($method, $path, $params = array()){
-        $params['short_name'] = $this->shortName;
-        $params['secret'] = $this->secret;
+		$params['short_name'] = $this->shortName;
+		$params['secret'] = $this->secret;
 		$params['remote_auth'] = $this->remoteAuth;
-        
-        if ($this->accessToken)
-        	$params['access_token'] = $this->accessToken;
+		
+		if ($this->accessToken)
+			$params['access_token'] = $this->accessToken;
 		
 		$url = $this->end_point . $path. '.' . $this->format;
 		

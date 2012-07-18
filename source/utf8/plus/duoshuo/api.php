@@ -1,17 +1,22 @@
 <?php
-//define('IN_ECS', true);
+define('IN_ECS', true);
 require_once(dirname(__FILE__)."/../../include/common.inc.php");
-error_reporting(E_ALL);
-ini_set('display_errors',1);
-require_once('duoshuo.php');
 
 if (!extension_loaded('json'))
 	include_once 'compat_json.php';
 
+function nocache_headers(){
+	header("Pragma:no-cache\r\n");
+	header("Cache-Control:no-cache\r\n");
+	header("Expires:0\r\n");
+}
+
 if (!headers_sent()) {
-	//nocache_headers();//max age TODO:
+	nocache_headers();//max age TODO:
 	header('Content-Type: text/javascript; charset=utf-8');
 }
+
+require_once('duoshuo.php');
 
 if (!class_exists('Duoshuo')){
 	$response = array(
@@ -33,7 +38,7 @@ class DuoshuoLocalServer{
 	 * 
 	 * @param array $input
 	 */
-	public function sync_posts($input = array()){
+	public function sync_log($input = array()){
 		$this->response['response'] = Duoshuo::syncCommentsToLocal();
 		$this->response['code'] = 0;
 	}

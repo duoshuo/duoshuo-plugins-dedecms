@@ -37,7 +37,7 @@ class Duoshuo_Exception extends Exception{
 	const PLUGIN_DEACTIVATED = 30;
 }
 
-include_once DEDEROOT.'/plus/duoshuo/duoshuo_client.php';
+require_once 'duoshuo_client.php';
 
 function rfc3339_to_mysql($string){
 	global $cfg_cli_time;
@@ -325,10 +325,10 @@ class Duoshuo{
 			//更新静态文件
 			if(Duoshuo::$syncToLocal && Duoshuo::$seoEnabled){
 				foreach($aidList as $aid){
-					include_once(Duoshuo::$adminPath."/config.php");
 					$startid = $aid;
 					$endid = $aid;
-					include_once(Duoshuo::$adminPath."/makehtml_archives_action.php");
+					$arc = new Archives($aid);
+					$arc->MakeHtml();
 					self::saveConfig('aid'.$aid, 'end');
 				}
 			}
