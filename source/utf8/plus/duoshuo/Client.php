@@ -5,7 +5,7 @@
  * @author shen2
  *
  */
-class DuoshuoClient{
+class Duoshuo_Client{
 	var $end_point = 'http://api.duoshuo.com/';
 	/**
 	 * 返回值格式
@@ -13,7 +13,7 @@ class DuoshuoClient{
 	 */
 	var $format = 'json';
 	
-	var $userAgent = 'DuoshuoSDK/0.2.0';
+	var $userAgent = 'DuoshuoPhpSdk/0.2.0';
 	
 	var $connecttimeout = 30;
 	var $timeout = 30;
@@ -122,7 +122,7 @@ class DuoshuoClient{
 		return $token;
 	}
 	
-	protected function http($url, $postfields, $method = 'POST'){
+	function http($url, $postfields, $method = 'POST'){
 		$ci = curl_init();
 		/* Curl settings */
 		curl_setopt($ci, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
@@ -159,5 +159,41 @@ class DuoshuoClient{
 		}
 		
 		return $response;
+	}
+	
+	/**
+	 * 
+	 * @param array $user_data
+	 */
+	function remoteAuth($user_data){
+	    $message = base64_encode(json_encode($user_data));
+	    $time = time();
+	    return $message . ' ' . self::hmacsha1($message . ' ' . $time, $this->secret) . ' ' . $time;
+	}
+	
+	// from: http://www.php.net/manual/en/function.sha1.php#39492
+	// Calculate HMAC-SHA1 according to RFC2104
+	// http://www.ietf.org/rfc/rfc2104.txt
+	static function hmacsha1($data, $key) {
+		if (function_exists('hash_hmac'))
+			return hash_hmac('sha1', $data, $key);
+		
+	    $blocksize=64;
+	    $hashfunc='sha1';
+	    if (strlen($key)>$blocksize)
+	        $key=pack('H*', $hashfunc($key));
+	    $key=str_pad($key,$blocksize,chr(0x00));
+	    $ipad=str_repeat(chr(0x36),$blocksize);
+	    $opad=str_repeat(chr(0x5c),$blocksize);
+	    $hmac = pack(
+	                'H*',$hashfunc(
+	                    ($key^$opad).pack(
+	                        'H*',$hashfunc(
+	                            ($key^$ipad).$data
+	                        )
+	                    )
+	                )
+	            );
+	    return bin2hex($hmac);
 	}
 }

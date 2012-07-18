@@ -1,19 +1,18 @@
 <?php if(!defined('DEDEINC')) exit('Request Error!');
-require_once(DEDEROOT.'/plus/duoshuo/duoshuo.php');
+require_once(DEDEROOT.'/plus/duoshuo.php');
 require_once(DEDEROOT.'/include/taglib/feedback.lib.php');
 function lib_duoshuo(&$ctag,&$refObj)
 {
-	if(!Duoshuo::$initialized){
-		
-		Duoshuo::init();
-	}
 	global $dsql,$envs,$cfg_phpurl,$cfg_basehost,$cfg_multi_site;
+	
+	$plugin = Duoshuo_Dedecms::getInstance();
+	
+	if (empty($plugin->shortName) || empty($plugin->secret)) 
+		return '在管理后台进行一步配置，就可以开始使用多说了';
+	
 	$attlist='type|0';
 	FillAttsDefault($ctag->CAttribute->Items,$attlist);
 	extract($ctag->CAttribute->Items, EXTR_SKIP);
-	
-	if (empty(Duoshuo::$shortName) || empty(Duoshuo::$secret))  return '在管理后台进行一步配置，就可以开始使用多说了';
-	$short_name = Duoshuo::$shortName;
 	
 	$arcid = !empty($refObj->Fields['aid']) ? $refObj->Fields['aid'] : 0;
 	$arctitle = !empty($refObj->Fields['title']) ? $refObj->Fields['title'] : 0;
@@ -25,9 +24,12 @@ function lib_duoshuo(&$ctag,&$refObj)
 	require (DEDEROOT.'/plus/duoshuo/templets/comments.htm');
 	$reval = ob_get_clean();
 	
-	if(Duoshuo::$seoEnabled && !empty($arcid)){
-		$infolen = 200;//每篇评论最大字数
-		$totalrow = Duoshuo::$seoMaxRow;
+	if($plugin->getOption('seo_enabled') && !empty($arcid)){
+		// 每篇评论最大字数
+		$infolen = 200;
+		// 每篇文章seo显示的最大行数
+		$totalrow = 100;
+		
 		ob_start();
 		include (DEDEROOT.'/plus/duoshuo/templets/comments_seo.htm');
 		$innertext = ob_get_clean();		

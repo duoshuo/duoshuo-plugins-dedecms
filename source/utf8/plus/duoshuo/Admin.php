@@ -1,17 +1,15 @@
 <?php 
-require_once(DEDEROOT.'/plus/duoshuo/duoshuo.php');
-class DuoshuoAdmin{
+
+class Duoshuo_Admin{
 	function manageComments(){
 		$ajax_comment_file = DEDETEMPLATE.'/default/ajaxfeedback.htm';
 	
 		$tag_replaced =  false;
 	
 		if(file_exists($ajax_comment_file)){
-			ob_start();
-			readfile($ajax_comment_file);
-			$comment_content = ob_get_clean();
+			$comment_content = file_get_contents($ajax_comment_file);
 			
-			if(strpos($comment_content,Duoshuo::$commentTag)!==false){
+			if(strpos($comment_content, Duoshuo_Dedecms::$commentTag)!==false){
 				$tag_replaced = true;
 			}
 		}
@@ -42,11 +40,10 @@ class DuoshuoAdmin{
 					Showmsg('备份'.$ajax_comment_file.'失败，请检查该目录权限，或手动复制到'.$ajax_comment_file_bak,-1,0,2000);
 				}
 			}
-			file_put_contents($ajax_comment_file, Duoshuo::$commentTag);
+			file_put_contents($ajax_comment_file, Duoshuo_Dedecms::$commentTag);
 			Showmsg('备份成功！',-1,0,2000);
 		}else{
 			Showmsg(DEDETEMPLATE.'/default/ajaxfeedback.bak.htm'.'不存在，请自行插入标签',-1,0,2000);
 		}
 	}
 }
-?>
