@@ -16,7 +16,7 @@ class Duoshuo_Admin{
 	
 		$params = array(
 				'template'		=>	'dedecms',
-				//'remote_auth'	=>	Duoshuo::remoteAuth(),
+				//'remote_auth'	=>	Duoshuo_Abstract::remoteAuth(),
 		);
 	
 		require DEDEROOT.'/plus/duoshuo/templets/duoshuo_manage.htm';

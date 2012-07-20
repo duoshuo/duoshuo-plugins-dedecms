@@ -1,5 +1,5 @@
 <?php
-define('IN_ECS', true);
+//define('IN_ECS', true);
 require_once(dirname(__FILE__)."/../../include/common.inc.php");
 
 if (!extension_loaded('json'))
@@ -16,6 +16,7 @@ if (!headers_sent()) {
 	header('Content-Type: text/javascript; charset=utf-8');
 }
 
+require_once 'Client.php';
 require_once 'Abstract.php';
 require_once 'Dedecms.php';
 require_once 'LocalServer.php';
@@ -41,6 +42,11 @@ try{
 				$input[$key] = stripslashes($value);
 		}
 		$server->dispatch($input);
+		$response = array(
+				'code'	=>	Duoshuo_Exception::SUCCESS,
+				'response'=> '操作完成',
+		);
+		echo json_encode($response);
 	}
 }
 catch (Exception $e){

@@ -30,7 +30,7 @@ class Duoshuo_Client{
 	}
 	
 	function getLogList($params){
-		$this->request('GET', 'log/list', $params);
+		return $this->request('GET', 'log/list', $params);
 	}
 	
 	/**

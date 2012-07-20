@@ -14,7 +14,7 @@ require_once(DEDEINC."/json.class.php");
 require_once(DEDEROOT.'/plus/duoshuo.php');
 require_once(DEDEROOT.'/plus/duoshuo/Admin.php');
 
-$duoshuoPlugin = new Duoshuo_Dedecms();
+$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
 // 设置默认参数
 $duoshuoPlugin->checkDefaultSettings();
 
@@ -22,7 +22,9 @@ $duoshuoPlugin->checkDefaultSettings();
 //从服务器返回的注册结果
 if(!empty($_GET) && isset($_GET['short_name']) && isset($_GET['secret'])){
 	$duoshuoPlugin->updateOption('short_name',$_GET['short_name']);
-	$duoshuoPlugin->updateOption('secret',$_GET['secret']);	
+	$duoshuoPlugin->shortName = $_GET['short_name'];
+	$duoshuoPlugin->updateOption('secret',$_GET['secret']);
+	$duoshuoPlugin->secret = $_GET['secret'];
 }
 
 //兼容0.1.x版本插件 引入多说配置文件 {{ 只用于 0.2.x
@@ -53,7 +55,7 @@ if(file_exists($configFile)){
 
 if(empty($duoshuoPlugin->shortName) || empty($duoshuoPlugin->secret)){
 	$params = $duoshuoPlugin->packageOptions();
-	$url = 'http://' . Duoshuo::DOMAIN . '/connect-site/?'. http_build_query($params, null, '&');
+	$url = 'http://' . Duoshuo_Abstract::DOMAIN . '/connect-site/?'. http_build_query($params, null, '&');
 	header("Location:" . $url, true);
 	exit;
 }

@@ -5,6 +5,8 @@ class Duoshuo_LocalServer{
 	
 	protected $plugin;
 	
+	protected $limit = 50;
+	
 	public function __construct($plugin){
 		$this->plugin = $plugin;
 	}
@@ -17,16 +19,22 @@ class Duoshuo_LocalServer{
 	public function sync_log($input = array()){
 		$syncLock = $this->plugin->getOption('sync_lock');//检查是否正在同步评论 同步完成后该值会置0
 		if(!isset($syncLock) || $syncLock > time()- 900){//正在或15分钟内发生过写回但没置0
+			$response = array(
+					'code'	=>	Duoshuo_Exception::SUCCESS,
+					'message'=> '同步中，请稍候',
+			);
+			echo json_encode($response);
 			return;
 		}
+		
 		try{
 			$this->plugin->updateOption('sync_lock',  time());
 			
-			$limit = 50;
+			$last_sync = $this->plugin->getOption('last_sync');
 			
 			$params = array(
-				'since' => $this->plugin->getOption('last_sync'),
-				'limit' => $limit,
+				'since' => $last_sync,
+				'limit' => $this->limit,
 				'order' => 'asc',
 			);
 			
@@ -59,6 +67,7 @@ class Duoshuo_LocalServer{
 							$affected = array();
 					}
 					//合并
+					
 					$affectedThreads = array_merge($affectedThreads, $affected);
 				
 					if ($log['date'] > $max_sync_date)
@@ -67,10 +76,10 @@ class Duoshuo_LocalServer{
 				
 				$params['since'] = $max_sync_date;
 					
-			} while ($count == $limit);//如果返回和最大请求条数一致，则再取一次
+			} while ($count == $this->limit);//如果返回和最大请求条数一致，则再取一次
 			
 			//唯一化
-			$aidList = array_unique($aidList);
+			$aidList = array_unique($affectedThreads);
 					
 			if ($max_sync_date > $last_sync)
 				$this->plugin->updateOption('last_sync', $max_sync_date);
@@ -117,7 +126,7 @@ class Duoshuo_LocalServer{
 		ksort($input);
 		$baseString = http_build_query($input, null, '&');
 		
-		$expectSignature = base64_encode(hash_hmac('sha1', $baseString, $this->_secret, true));
+		$expectSignature = base64_encode(hash_hmac('sha1', $baseString, $this->plugin->secret, true));
 		if ($signature !== $expectSignature)
 			throw new Duoshuo_Exception('Invalid signature, expect: ' . $expectSignature . '. (' . $baseString . ')', Duoshuo_Exception::INVALID_SIGNATURE);
 		

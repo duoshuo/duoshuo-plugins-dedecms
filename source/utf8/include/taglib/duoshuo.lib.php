@@ -17,12 +17,12 @@ function lib_duoshuo(&$ctag,&$refObj)
 	$arcid = !empty($refObj->Fields['aid']) ? $refObj->Fields['aid'] : 0;
 	$arctitle = !empty($refObj->Fields['title']) ? $refObj->Fields['title'] : 0;
 	
-	$data_source_thread_id = !empty($arcid) ? ' data-source-thread-id="'.$arcid.'"' : '';
-	$data_title = !empty($arctitle) ? ' data-title="'.htmlspecialchars($arctitle).'"' : '';
+	$data_source_thread_id = !empty($arcid) ? " data-source-thread-id= '$arcid'" : "";
+	$htmltitle = htmlspecialchars($arctitle,ENT_QUOTES);
+	$data_title = !empty($arctitle) ? " data-title='$htmltitle'" : "";
 	
 	ob_start();
 	require (DEDEROOT.'/plus/duoshuo/templets/comments.htm');
-	$reval = ob_get_clean();
 	
 	if($plugin->getOption('seo_enabled') && !empty($arcid)){
 		// 每篇评论最大字数
@@ -30,12 +30,10 @@ function lib_duoshuo(&$ctag,&$refObj)
 		// 每篇文章seo显示的最大行数
 		$totalrow = 100;
 		
-		ob_start();
-		include (DEDEROOT.'/plus/duoshuo/templets/comments_seo.htm');
-		$innertext = ob_get_clean();		
-		
-		$seoComments = 
-'<div id="ds-ssr" class="mt1">
+		$innertext  = file_get_contents(DEDEROOT.'/plus/duoshuo/templets/comments_seo.htm');
+
+?>
+<div id="ds-ssr" class="mt1">
 	<dl class="tbox">
 		<dt> <strong>评论列表（网友评论仅供网友表达个人看法，并不表明本站同意其观点或证实其描述）</strong> </dt>
 		<dd>
@@ -43,8 +41,8 @@ function lib_duoshuo(&$ctag,&$refObj)
 				<div class="decmt-box1">
 					<ul>
 						<li id="commetcontentNew"></li>
-';
-		
+
+<?php 		
 		$wsql = " WHERE ischeck=1 AND aid = $arcid";
 		$equery = "SELECT * FROM `#@__feedback` $wsql ORDER BY id DESC LIMIT 0 , $totalrow";
 		$ctp = new DedeTagParse();
@@ -64,17 +62,18 @@ function lib_duoshuo(&$ctag,&$refObj)
 					$ctp->Assign($tagid,$arr[$ctag->GetName()]);
 				}
 			}
-			$seoComments .= $ctp->GetResult();
+			echo $ctp->GetResult();
 		}
-		$seoComments .= 
-'					</ul>
+?> 
+					</ul>
 				</div>
 			</div>
 		</dd>
 	</dl>
-</div>'."\n";
-		$reval .= $seoComments;
+</div>
+
+<?php 
 	}
-	
-	return $reval;
+
+	return ob_get_clean();
 }
