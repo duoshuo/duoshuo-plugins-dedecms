@@ -21,9 +21,8 @@ class Duoshuo_LocalServer{
 		if(!isset($syncLock) || $syncLock > time()- 900){//正在或15分钟内发生过写回但没置0
 			$response = array(
 					'code'	=>	Duoshuo_Exception::SUCCESS,
-					'message'=> '同步中，请稍候',
+					'response'=> '同步中，请稍候',
 			);
-			echo json_encode($response);
 			return;
 		}
 		
@@ -98,7 +97,7 @@ class Duoshuo_LocalServer{
 		}
 		
 		//$this->response['response']
-		$this->response['code'] = 0;
+		$this->response['code'] = Duoshuo_Exception::SUCCESS;
 	}
 	
 	public function update_option($input = array()){

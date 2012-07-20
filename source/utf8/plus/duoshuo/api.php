@@ -42,11 +42,6 @@ try{
 				$input[$key] = stripslashes($value);
 		}
 		$server->dispatch($input);
-		$response = array(
-				'code'	=>	Duoshuo_Exception::SUCCESS,
-				'response'=> '操作完成',
-		);
-		echo json_encode($response);
 	}
 }
 catch (Exception $e){
