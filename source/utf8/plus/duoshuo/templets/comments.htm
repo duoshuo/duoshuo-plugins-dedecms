@@ -1,7 +1,10 @@
+<?php
+	$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
+?>
 <!-- Duoshuo Comment BEGIN -->
 	<div class="ds-thread" <?php echo $data_source_thread_id.$data_title;?>></div>
 	<script type="text/javascript">
-	var duoshuoQuery = {short_name: "<?php echo $plugin->shortName ;?>"};
+	var duoshuoQuery = {short_name: "<?php echo $plugin->getOption('short_name') ;?>"};
 	(function() {
 		var ds = document.createElement('script');
 		ds.type = 'text/javascript';ds.async = true;

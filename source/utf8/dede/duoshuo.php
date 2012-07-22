@@ -21,39 +21,37 @@ $duoshuoPlugin->checkDefaultSettings();
 
 //从服务器返回的注册结果
 if(!empty($_GET) && isset($_GET['short_name']) && isset($_GET['secret'])){
-	$duoshuoPlugin->updateOption('short_name',$_GET['short_name']);
-	$duoshuoPlugin->shortName = $_GET['short_name'];
-	$duoshuoPlugin->updateOption('secret',$_GET['secret']);
-	$duoshuoPlugin->secret = $_GET['secret'];
+	$keys = array('short_name','secret');
+	foreach ($keys as $key){
+		$duoshuoPlugin->updateOption($_GET[$key]);
+	}
 }
 
 //兼容0.1.x版本插件 引入多说配置文件 {{ 只用于 0.2.x
 $configFile =  DEDEDATA.'/duoshuo.inc.php';
 
 if(file_exists($configFile)){
-	if(empty($duoshuoPlugin->shortName) || empty($duoshuoPlugin->secret)){//如果数据库设置不完整,从文件导入
+	if($duoshuoPlugin->getOption('short_name') == '' ||$duoshuoPlugin->getOption('secret') == ''){//如果数据库设置不完整,从文件导入
 		include_once $configFile;
 		global $cfg_duoshuo;
 		if(isset($cfg_duoshuo))
 		{
-			if(empty($duoshuoPlugin->shortName) && !empty($cfg_duoshuo['short_name'])){
+			if($duoshuoPlugin->getOption('short_name') == '' && !empty($cfg_duoshuo['short_name'])){
 				$duoshuoPlugin->updateOption('short_name', $cfg_duoshuo['short_name']);
-				$duoshuoPlugin->shortName = $cfg_duoshuo['short_name'];
 			}
-			if(empty($duoshuoPlugin->secret) && !empty($cfg_duoshuo['secret'])){
+			if($duoshuoPlugin->getOption('secret') == ''  && !empty($cfg_duoshuo['secret'])){
 				$duoshuoPlugin->updateOption('secret',$cfg_duoshuo['secret']);
-				$duoshuoPlugin->secret = $cfg_duoshuo['secret'];
 			}
 		}
 	}
 
-	if(!empty($duoshuoPlugin->shortName) && !empty($duoshuoPlugin->secret)){
+	if($duoshuoPlugin->getOption('short_name') != '' && $duoshuoPlugin->getOption('secret') != ''){
 		$success = unlink($configFile);//如果数据库已经设置，删除文件
 	}
 }
 //}}
 
-if(empty($duoshuoPlugin->shortName) || empty($duoshuoPlugin->secret)){
+if($duoshuoPlugin->getOption('short_name') == '' || $duoshuoPlugin->getOption('secret') == ''){
 	$params = $duoshuoPlugin->packageOptions();
 	$url = 'http://' . Duoshuo_Abstract::DOMAIN . '/connect-site/?'. http_build_query($params, null, '&');
 	header("Location:" . $url, true);

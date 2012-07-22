@@ -10,21 +10,11 @@ class Duoshuo_Abstract {
 	 *
 	 * @var string
 	 */
-	public $shortName;
-	
-	/**
-	 *
-	 * @var string
-	 */
-	public $secret;
-	
+	public $options;
 	
 	public function __construct(){
-		//从数据库获取结果
-		$this->shortName = $this->getOption('short_name');
-		$this->secret = $this->getOption('secret');
-		
-		//self::$seoEnabled = $this->getOption('seo_enabled') !== NULL ? $this->getOption('seo_enabled') : self::$seoEnabled;
+		$this->getOption('short_name');
+		$this->getOption('secret');
 	}
 	
 	public function rfc3339_to_mysql($string){
@@ -53,7 +43,7 @@ class Duoshuo_Abstract {
 	 * @return Duoshuo_Client
 	 */
 	public function getClient($remoteAuth = null){	//如果不输入参数，就是游客
-		return new Duoshuo_Client($this->shortName, $this->secret, $remoteAuth);
+		return new Duoshuo_Client($this->getOption('short_name'), $this->getOption('secret'), $remoteAuth);
 	}
 	
 	/**
@@ -61,5 +51,10 @@ class Duoshuo_Abstract {
 	 */
 	public function getOption($key){
 		//依赖子类实现
+		/*
+		 if(isset($this->options[$key])){
+			return $this->options[$key];
+		 }
+		 */
 	}
 }

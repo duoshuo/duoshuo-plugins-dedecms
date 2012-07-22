@@ -67,19 +67,24 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			." WHERE varname = 'duoshuo_$key'";
 		}
 		$option = $dsql->ExecuteNoneQuery($sql);
-		
+		$this->options[$key] = $value;
 		return $option;
 	}
 	
 	public function getOption($key){
-		global $dsql;
-		$sql = "SELECT value FROM #@__sysconfig WHERE varname = 'duoshuo_$key'";
-		$value = $dsql->GetOne($sql);
-		if(is_array($value)){
-			return $value['value'];
-		}
-		else{
-			return NULL;
+		if(isset($this->options[$key])){
+			return $this->options[$key];
+		}else{
+			global $dsql;
+			$sql = "SELECT value FROM #@__sysconfig WHERE varname = 'duoshuo_$key'";
+			$value = $dsql->GetOne($sql);
+			if(is_array($value)){
+				$this->options[$key] = $value['value'];
+				return $value['value'];
+			}
+			else{
+				return NULL;
+			}
 		}
 	}
 	
@@ -121,7 +126,6 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				$defaultSetting['info'], $defaultSetting['type']);
 			}
 		}
-		
 	}
 	
 	public static function currentUrl(){
@@ -144,7 +148,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		global $cfg_webname,$cfg_description,$cfg_basehost,$cfg_indexurl,$cfg_adminemail,$cur_url,$cfg_cli_time;
 		$params = array(
 			'name'			=>	htmlspecialchars_decode($cfg_webname),
-			'short_name'	=>	$this->shortName,
+			'short_name'	=>	$this->options['short_name'],
 			'system'		=>	'dedecms',
 			'callback'		=>	self::currentUrl(),
 			'local_api_url' => $cfg_basehost.'/plus/duoshuo/api.php',
@@ -188,7 +192,6 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				$ischeck = self::$approvedMap[$meta['status']];
 				$dtime = strtotime($meta['created_at']);
 				$message = addslashes($meta['message']);
-				
 				$sql = "INSERT INTO #@__feedback (aid,typeid,username,arctitle,ip,ischeck,dtime,mid,bad,good,ftype,face,msg) VALUES ("
 				."$sourceThreadId,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
 				$dsql->ExecuteNoneQuery($sql);
@@ -250,7 +253,6 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		foreach($aidList as $aid){
 			$arc = new Archives($aid);
 			$arc->MakeHtml();
-			$this->updateOption('aid'.$aid, 'end');
 		}
 	}
 	

@@ -7,7 +7,7 @@ function lib_duoshuo(&$ctag,&$refObj)
 	
 	$plugin = Duoshuo_Dedecms::getInstance();
 	
-	if (empty($plugin->shortName) || empty($plugin->secret)) 
+	if ($duoshuoPlugin->getOption('short_name') == '' || $duoshuoPlugin->getOption('secret') == '') 
 		return '在管理后台进行一步配置，就可以开始使用多说了';
 	
 	$attlist='type|0';

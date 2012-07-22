@@ -1,5 +1,4 @@
 <?php
-//define('IN_ECS', true);
 require_once(dirname(__FILE__)."/../../include/common.inc.php");
 
 if (!extension_loaded('json'))
