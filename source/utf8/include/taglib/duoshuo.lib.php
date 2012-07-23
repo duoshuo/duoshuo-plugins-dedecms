@@ -7,19 +7,23 @@ function lib_duoshuo(&$ctag,&$refObj)
 	
 	$plugin = Duoshuo_Dedecms::getInstance();
 	
-	if ($duoshuoPlugin->getOption('short_name') == '' || $duoshuoPlugin->getOption('secret') == '') 
+	if ($plugin->getOption('short_name') == '' || $plugin->getOption('secret') == '') 
 		return '在管理后台进行一步配置，就可以开始使用多说了';
 	
 	$attlist='type|0';
 	FillAttsDefault($ctag->CAttribute->Items,$attlist);
 	extract($ctag->CAttribute->Items, EXTR_SKIP);
 	
-	$arcid = !empty($refObj->Fields['aid']) ? $refObj->Fields['aid'] : 0;
-	$arctitle = !empty($refObj->Fields['title']) ? $refObj->Fields['title'] : 0;
+	if(empty($refObj->Fields['aid'])){
+		return '';
+	}
+	$arcid = $refObj->Fields['aid'];
 	
-	$data_source_thread_id = !empty($arcid) ? " data-source-thread-id= '$arcid'" : "";
-	$htmltitle = htmlspecialchars($arctitle,ENT_QUOTES);
-	$data_title = !empty($arctitle) ? " data-title='$htmltitle'" : "";
+	$attrs = array();
+	$attrs[] = $arcid;
+	if(!empty($refObj->Fields['title'])){
+		$attrs[] = htmlspecialchars($refObj->Fields['title'],ENT_QUOTES);
+	}
 	
 	ob_start();
 	require (DEDEROOT.'/plus/duoshuo/templets/comments.htm');
