@@ -20,11 +20,10 @@ function lib_duoshuo(&$ctag,&$refObj)
 	$arcid = $refObj->Fields['aid'];
 	
 	$attrs = array();
-	$attrs[] = $arcid;
+	$attrs[] = ' data-source-thread-id="'.$arcid.'"';
 	if(!empty($refObj->Fields['title'])){
-		$attrs[] = htmlspecialchars($refObj->Fields['title'],ENT_QUOTES);
+		$attrs[] = 'data-title="'.htmlspecialchars($refObj->Fields['title'],ENT_QUOTES).'"';
 	}
-	
 	ob_start();
 	require (DEDEROOT.'/plus/duoshuo/templets/comments.htm');
 	

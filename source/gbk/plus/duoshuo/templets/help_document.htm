@@ -1,0 +1,33 @@
+<?php
+	$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
+	$params = array(
+			'template'		=>	'dedecms',
+			//'remote_auth'	=>	Duoshuo_Abstract::remoteAuth(),
+	);
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
+<title>多说评论管理</title>
+<script language="javascript" src="../include/js/jquery/jquery.js"></script>
+<script language="javascript" src="../include/js/dedeajax2.js"></script>
+<link href="css/base.css" rel="stylesheet" type="text/css" />
+</head>
+<body background="images/allbg.gif" leftmargin="8" topmargin="8">
+<table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6">
+	<tr>
+		<td height="28" background="images/tbg.gif" colspan="8" style="padding-left:10px;">
+		<div style="float:left">
+			<b>多说开发者中心-帮助文档</b>
+			[<a style="font-size:13px" target="_blank" href="http://dev.duoshuo.com/docs/"><u>在新窗口中打开</u></a>]
+		</div>
+		</td>
+	</tr>
+</table>
+<iframe id="duoshuo-remote-window" src="http://dev.duoshuo.com/docs/" style="width:100%;border: 0 none;">
+</iframe>
+
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<?php
+	$ajax_comment_file = DEDETEMPLATE.'/default/ajaxfeedback.htm';
+	$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
+	$tag_replaced =  false;
+	
+	if(file_exists($ajax_comment_file)){
+		$comment_content = file_get_contents($ajax_comment_file);
+		
+		if(strpos($comment_content, Duoshuo_Dedecms::$commentTag)!==false){
+			$tag_replaced = true;
+		}
+	}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
+<title>多说评论管理</title>
+<script language="javascript" src="../include/js/jquery/jquery.js"></script>
+<script language="javascript" src="../include/js/dedeajax2.js"></script>
+<link href="css/base.css" rel="stylesheet" type="text/css" />
+</head>
+<body background="images/allbg.gif" leftmargin="8" topmargin="8">
+<table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
+	<tr>
+		<td width="50%" height="28" background="images/tbg.gif" style="padding-left:10px;">
+			<div style="float:left">
+				<b>自动替换原始评论框</b>
+			</div>
+		</td>
+		<td width="50%" height="28" background="images/tbg.gif" style="padding-left:10px;">
+			<div style="float:left">
+				<b>手动替换原始评论框</b>
+			</div>
+		</td>
+	</tr>
+	<tr bgcolor="#FFFFFF" height="26">
+		<td style="padding-left:10px;">
+			<div style="float:left">
+				<?php if(!$tag_replaced):?>
+				<form action="duoshuo.php" name="replaceCommentTag" method="post">
+					<input name="action" type="hidden" value="replaceCommentTag"/>
+					如果您未改动过系统模板评论部分，建议使用自动替换。
+					<p>自动替换将会备份/templets/ajaxfeeback.htm为/templets/ajaxfeedback.back.htm，并将<b><?php echo Duoshuo_Dedecms::$commentTag;?> </b>写入新的/templets/ajaxfeeback.htm模板。
+					</p>
+					<p>
+					<input type="button" size="12" onclick="document.replaceCommentTag.submit();" style="width:50px" value="替换" />
+					</p>
+				</form>
+				<?php else:?>
+					检测到自动替换已经生效，如使用静态HTML文档，需先 [<a target="main" href="makehtml_archives.php"><u>更新文档HTML</u></a>] 之后，以前的文章才会显示多说评论框。
+					<p>自动替换已经将/templets/ajaxfeeback.htm备份为/templets/ajaxfeedback.back.htm，并将<b><?php echo Duoshuo_Dedecms::$commentTag;?> </b>写入新的/templets/ajaxfeeback.htm模板。</p>
+					
+				<?php endif;?>
+			</div>
+		</td>
+		<td style="padding-left:10px;">
+			<div style="float:left">
+				<?php if($tag_replaced):?>
+				<p>检测到自动替换已经生效，如果您的文章页仍未显示评论框，请先更新静态文档，再考虑手动替换。</p>
+				<?php endif;?>
+				<p>如果您更改过系统模板评论部分，或需要在文章页中其他位置使用评论框。只需在文章模板相应位置插入 <span style="color:red"><?php echo Duoshuo_Dedecms::$commentTag;?></span>
+				</p>
+			</div>
+		</td>
+	</tr>
+</table>
+<table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
+	<tr>
+		<td height="28" background="images/tbg.gif" colspan="2" style="padding-left:10px;">
+			<div style="float:left">
+				<b>本地设置</b>
+			</div>
+		</td>
+	</tr>
+	<form action="duoshuo.php" name="localConfig" method="post">
+		<input name="action" type="hidden" value="saveLocalConfig"/>
+		<tr bgcolor="#FFFFFF"  height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td width="250px" align="right">多说二级域名(修改可能导致评论框不可用)</td>
+			<td align="left"><input type="text" name="short_name" style="width:270px" value="<?php echo $duoshuoPlugin->getOption('short_name'); ?>"/></td>
+		</tr>
+		<tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td align="right">多说密钥(修改可能导致评论框不可用)</td>
+			<td align="left"><input type="text" name="secret" style="width:270px" value="<?php echo $duoshuoPlugin->getOption('secret'); ?>"/></td>
+		</tr>
+		<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td align="right">启用实时评论回流功能</td>
+			<td align="left">默认已开启，请在"多说"-"评论管理"-"设置"中，关闭和开启实时评论回流功能</td>
+		</tr>
+		<tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td align="right">开启SEO优化</td>
+			<td align="left">
+			<input class="np" type="hidden" name="seo_enabled" value="0" />
+			<input class="np" type="checkbox" <?php echo $duoshuoPlugin->getOption('seo_enabled')? "checked='checked'" : ''; ?> name="seo_enabled" value="1" /></td>
+		</tr>
+		<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="保存设置" /></td>
+		</tr>
+	</form>
+</table>
+<!--
+<table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
+	<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td align="right">现在执行评论回流</td>
+			<td align="left"><input class="np" type="checkbox" value="9" name="aids" /></td>
+		</tr>
+</table>
+-->
+	<!-- <tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+		<td width="10%">通用标签：</td>
+		<td width="90%" colspan="2">如果您之前已经关闭了评论，或想在某一模板里加入评论框，请在页面模板中加入 <b><?php echo $this->tag;?> </b> 
+		[<a style="font-size:13px" target="_blank" href="http://blog.duoshuo.com/help/dedecms-install/duoshuo-tag/"><u>参考文档</u></a>]</td>
+	</tr> -->
+
+</body>
+</html>

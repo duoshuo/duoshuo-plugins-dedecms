@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../../include/common.inc.php");
 require_once(DEDEINC.'/arc.archives.class.php');
-
+//exit();
 if (!extension_loaded('json'))
 	include_once 'compat_json.php';
 
@@ -33,13 +33,6 @@ if (!class_exists('Duoshuo_Dedecms')){
 
 $plugin = Duoshuo_Dedecms::getInstance();
 
-error_reporting(E_ALL);
-ini_set('display_startup_errors', 1);
-ini_set('display_errors', 1);
-
-$server = new Duoshuo_LocalServer($plugin);
-$server->sync_log();
-exit();
 try{
 	if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$server = new Duoshuo_LocalServer($plugin);

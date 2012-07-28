@@ -41,20 +41,20 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	}
 	
 	/**
-	 * ä¿å­˜å¤šè¯´è®¾ç½®
-	 * @param é”® $key
-	 * @param å€¼ $value
-	 * @param é”®å $info
-	 * @param ç±»å‹ $type
-	 * @param ç»„åˆ« $groupid
+	 * ±£´æ¶àËµÉèÖÃ
+	 * @param ¼ü $key
+	 * @param Öµ $value
+	 * @param ¼üÃû $info
+	 * @param ÀàĞÍ $type
+	 * @param ×é±ğ $groupid
 	 */
 	public function updateOption($key, $value, $info = NULL,$type = NULL,$groupid = NULL){
 		global $dsql;
 		$oldvalue = $this->getOption($key);
 		if($oldvalue===NULL){
-			$info = isset($info) ? $info : 'å¤šè¯´è®¾ç½®é¡¹'; //é»˜è®¤å€¼
-			$type = isset($type) ? $type : 'string';	//é»˜è®¤å€¼
-			$groupid = isset($groupid) ? $groupid : 8;	//é»˜è®¤å€¼
+			$info = isset($info) ? $info : '¶àËµÉèÖÃÏî'; //Ä¬ÈÏÖµ
+			$type = isset($type) ? $type : 'string';	//Ä¬ÈÏÖµ
+			$groupid = isset($groupid) ? $groupid : 8;	//Ä¬ÈÏÖµ
 			
 			$sql = "INSERT into #@__sysconfig (varname, value, info, type, groupid) values ('duoshuo_$key','$value','$info','$type',$groupid)";
 		}
@@ -92,27 +92,27 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		$duoshuoDefaultSettings = array(
 			'short_name'	=>	array(
 				'value' =>	'',
-				'info'	=>	'å¤šè¯´äºŒçº§åŸŸå',
+				'info'	=>	'¶àËµ¶ş¼¶ÓòÃû',
 				'type'	=>	'string',
 			),
 			'secret'	=>	array(
 				'value' =>	'',
-				'info'	=>	'å¤šè¯´ç«™ç‚¹å¯†é’¥',
+				'info'	=>	'¶àËµÕ¾µãÃÜÔ¿',
 				'type'	=>	'string',
 			),
 			'sync_lock'		=>	array(
 				'value'	=>	0,
-				'info'	=>	'å¤šè¯´æ­£åœ¨åŒæ­¥æ—¶é—´(0è¡¨ç¤ºåŒæ­¥æ­£å¸¸å®Œæˆ)',
+				'info'	=>	'¶àËµÕıÔÚÍ¬²½Ê±¼ä(0±íÊ¾Í¬²½Õı³£Íê³É)',
 				'type'	=>	'int',
 			),
 			'last_sync'	=>	array(
 				'value'	=>	0,
-				'info'	=>	'å·²å®Œæˆçš„æœ€ååŒæ­¥è®°å½•id',
+				'info'	=>	'ÒÑÍê³ÉµÄ×îºóÍ¬²½¼ÇÂ¼id',
 				'type'	=>	'int',
 			),
 			'seo_enabled'	=>	array(
-				'value'	=>	0,
-				'info'	=>	'å¼€å¯SEOä¼˜åŒ–',
+				'value'	=>	1,
+				'info'	=>	'¿ªÆôSEOÓÅ»¯',
 				'type'	=>	'int',
 			),
 		);
@@ -137,8 +137,8 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	}
 	
 	/**
-	 *  æ‰“åŒ…é€‰é¡¹ä¿¡æ¯
-	 *  ä¾‹å¦‚ï¼špageckageOptions();
+	 *  ´ò°üÑ¡ÏîĞÅÏ¢
+	 *  ÀıÈç£ºpageckageOptions();
 	 *
 	 * @access	public
 	 * @return	array
@@ -173,34 +173,34 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
 	public function createPost($meta){
 		global $dsql;
-		//æŸ¥æ‰¾åŒæ­¥è®°å½•
+		//²éÕÒÍ¬²½¼ÇÂ¼
 		$postId = $meta['post_id'];
 		$sql = "SELECT * FROM duoshuo_commentmeta WHERE post_id = $postId";
 		$synced = $dsql->GetOne($sql);
-		if(is_array($synced)){//createæ“ä½œçš„è¯„è®ºï¼Œæ²¡åŒæ­¥è¿‡æ‰å¤„ç†
-			return array();
+		if(is_array($synced)){//create²Ù×÷µÄÆÀÂÛ£¬Ã»Í¬²½¹ı²Å´¦Àí
+			return null;
 		}
-		if(!empty($meta['thread_key'])){
-			$aid = $meta['thread_key'];
+		if(!empty($meta['source_thread_id'])){
+			$aid = $meta['source_thread_id'];
 			$sql = "SELECT title FROM #@__archives WHERE id = $aid";
 			$thread = $dsql->GetOne($sql);
 			if(is_array($thread)){
-				//æ³¨æ„é˜²æ­¢sqlæ³¨å…¥ title,author_name,message
+				//×¢Òâ·ÀÖ¹sql×¢Èë title,author_name,message
 				$title = addslashes($thread['title']);
-				$threadKey = $meta['thread_key'];
-				$author_name = addslashes(trim(strip_tags($meta['author_name'])));
+				$sourceThreadId = $meta['source_thread_id'];
+				$author_name = addslashes(iconv("UTF-8","GBK",trim(strip_tags($meta['author_name']))));
 				$ip = $meta['ip'];
 				$ischeck = self::$approvedMap[$meta['status']];
 				$dtime = strtotime($meta['created_at']);
-				$message = addslashes($meta['message']);
+				$message = addslashes(iconv("UTF-8","GBK",strip_tags($meta['message'])));
 				$sql = "INSERT INTO #@__feedback (aid,typeid,username,arctitle,ip,ischeck,dtime,mid,bad,good,ftype,face,msg) VALUES ("
-				."$threadKey,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
+				."$sourceThreadId,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
 				$dsql->ExecuteNoneQuery($sql);
 				$last_id = $dsql->GetLastID();
 				$sql = "INSERT INTO duoshuo_commentmeta (post_id,cid) VALUES ($postId,$last_id)";
 				$dsql->ExecuteNoneQuery($sql);
 				return array($aid);
-			}//æ²¡æœ‰æ–‡ç« ç›´æ¥ç•¥å»è¯„è®º
+			}//Ã»ÓĞÎÄÕÂÖ±½ÓÂÔÈ¥ÆÀÂÛ
 		}
 		return null;
 	}
@@ -211,7 +211,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		foreach($postIdArray as $postId){
 			$sql = "SELECT * FROM duoshuo_commentmeta WHERE post_id = $postId";
 			$synced = $dsql->GetOne($sql);
-			if(!is_array($synced)){//écreateæ“ä½œçš„è¯„è®ºï¼ŒåŒæ­¥è¿‡æ‰å¤„ç†
+			if(!is_array($synced)){//·Çcreate²Ù×÷µÄÆÀÂÛ£¬Í¬²½¹ı²Å´¦Àí
 				continue;
 			}
 			$cid = $synced['cid'];
@@ -234,7 +234,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		foreach($postIdArray as $postId){
 			$sql = "SELECT * FROM duoshuo_commentmeta WHERE post_id = ".$postId;
 			$synced = $dsql->GetOne($sql);
-			if(!is_array($synced)){//écreateæ“ä½œçš„è¯„è®ºï¼ŒåŒæ­¥è¿‡æ‰å¤„ç†
+			if(!is_array($synced)){//·Çcreate²Ù×÷µÄÆÀÂÛ£¬Í¬²½¹ı²Å´¦Àí
 				continue;
 			}
 			$cid = $synced['cid'];
@@ -252,12 +252,15 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
 	public function refreshThreads($aidList){
 		foreach($aidList as $aid){
+			echo 0.3;
 			$arc = new Archives($aid);
+			echo 0.5;
 			$arc->MakeHtml();
+			echo 1;
 		}
 	}
 	
-	public function userData($userId){	// null ä»£è¡¨å½“å‰ç™»å½•ç”¨æˆ·ï¼Œ0ä»£è¡¨æ¸¸å®¢
+	public function userData($userId){	// null ´ú±íµ±Ç°µÇÂ¼ÓÃ»§£¬0´ú±íÓÎ¿Í
 		if ($userId === null)
 			$current_user = wp_get_current_user();
 		elseif($userId != 0)
