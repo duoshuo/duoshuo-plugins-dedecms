@@ -20,7 +20,7 @@ function lib_duoshuo(&$ctag,&$refObj)
 	$arcid = $refObj->Fields['aid'];
 	
 	$attrs = array();
-	$attrs[] = ' data-source-thread-id="'.$arcid.'"';
+	$attrs[] = ' data-thread-key="'.$arcid.'"';
 	if(!empty($refObj->Fields['title'])){
 		$attrs[] = 'data-title="'.htmlspecialchars($refObj->Fields['title'],ENT_QUOTES).'"';
 	}

@@ -2,17 +2,18 @@
 
 class Duoshuo_Admin{
 	function manageComments(){
-		$ajax_comment_file = DEDETEMPLATE.'/default/ajaxfeedback.htm';
-
-		$params = array(
-				'template'		=>	'dedecms',
-				//'remote_auth'	=>	Duoshuo_Abstract::remoteAuth(),
-		);
-		
-		require DEDEROOT.'/plus/duoshuo/templets/manage_comments.htm';
-		
+		$adminPath = 'admin/';
+		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
 	}
 	
+	function adminUsers(){
+		$adminPath = 'admin/users/';
+		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
+	}
+	function adminSettings(){
+		$adminPath = 'admin/settings/';
+		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
+	}
 	function localConfig(){
 		require DEDEROOT.'/plus/duoshuo/templets/local_config.htm';
 	}
@@ -27,7 +28,7 @@ class Duoshuo_Admin{
 			}
 		}
 		
-		Showmsg('保存成功！',-1,0,1000);
+		Showmsg('保存成功！','./duoshuo.php?action=localConfig',0,1000);
 	}
 	
 	
@@ -46,9 +47,18 @@ class Duoshuo_Admin{
 				}
 			}
 			file_put_contents($ajax_comment_file, Duoshuo_Dedecms::$commentTag);
-			Showmsg('备份成功！','duoshuo.php?action=localConfig',0,1000);
+			if(isset($_POST['next_step'])){
+				Showmsg('备份成功！','./duoshuo.php?action='.$_POST['next_step'],0,1000);
+			}else{
+				Showmsg('备份成功！','./duoshuo.php?action=localConfig',0,1000);
+			}
 		}else{
-			Showmsg(DEDETEMPLATE.'/default/ajaxfeedback.bak.htm'.'不存在，请自行插入标签',-1,0,2000);
+			Showmsg(DEDETEMPLATE.'/default/ajaxfeedback.bak.htm'.'不存在，请手动插入标签','./duoshuo.php?action=localConfig',0,2000);
 		}
 	}
+	
+	function installStep1(){
+		require DEDEROOT.'/plus/duoshuo/templets/replace_tag.htm';
+	}
+	
 }

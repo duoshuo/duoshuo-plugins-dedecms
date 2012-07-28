@@ -4,6 +4,9 @@
 			'template'		=>	'dedecms',
 			//'remote_auth'	=>	Duoshuo_Abstract::remoteAuth(),
 	);
+	if(!isset($adminPath)){
+		$adminPath = 'admin/';
+	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -20,13 +23,13 @@
 		<td height="28" background="images/tbg.gif" colspan="8" style="padding-left:10px;">
 		<div style="float:left">
 			<b>多说管理后台</b>
-			[<a style="font-size:13px" target="_blank" href="<?php echo 'http://' . $duoshuoPlugin->getOption('short_name') . '.' . Duoshuo_Abstract::DOMAIN.'/admin/';?>"><u>在新窗口中打开</u></a>]
+			[<a style="font-size:13px" target="_blank" href="<?php echo 'http://' . $duoshuoPlugin->getOption('short_name') . '.' . Duoshuo_Abstract::DOMAIN.'/'.$adminPath;?>"><u>在新窗口中打开</u></a>]
 			[<a style="font-size:13px" target="_blank" href="<?php echo 'http://' . Duoshuo_Abstract::DOMAIN.'/settings/';?>"><u>个人资料设置</u></a>]
 		</div>
 		</td>
 	</tr>
 </table>
-<iframe id="duoshuo-remote-window" src="<?php echo 'http://' . $duoshuoPlugin->getOption('short_name') . '.' . Duoshuo_Abstract::DOMAIN .'/admin/?'.http_build_query($params);?>" style="width:100%;border: 0 none;">
+<iframe id="duoshuo-remote-window" src="<?php echo 'http://' . $duoshuoPlugin->getOption('short_name') . '.' . Duoshuo_Abstract::DOMAIN .'/'.$adminPath.'?'.http_build_query($params);?>" style="width:100%;border: 0 none;">
 </iframe>
 
 <script>

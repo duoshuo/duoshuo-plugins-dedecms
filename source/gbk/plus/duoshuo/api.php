@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../../include/common.inc.php");
 require_once(DEDEINC.'/arc.archives.class.php');
-//exit();
+
 if (!extension_loaded('json'))
 	include_once 'compat_json.php';
 
@@ -13,7 +13,7 @@ function nocache_headers(){
 
 if (!headers_sent()) {
 	nocache_headers();//max age TODO:
-	header('Content-Type: text/javascript; charset=utf-8');
+	header('Content-Type: text/javascript; charset=gb2312');
 }
 
 require_once 'Client.php';

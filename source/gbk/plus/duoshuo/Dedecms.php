@@ -147,7 +147,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	{
 		global $cfg_webname,$cfg_description,$cfg_basehost,$cfg_indexurl,$cfg_adminemail,$cur_url,$cfg_cli_time;
 		$params = array(
-			'name'			=>	htmlspecialchars_decode($cfg_webname),
+			'name'			=>	iconv("GBK","UTF-8",$cfg_webname),
 			'short_name'	=>	$this->options['short_name'],
 			'system'		=>	'dedecms',
 			'callback'		=>	self::currentUrl(),
@@ -178,23 +178,23 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		$sql = "SELECT * FROM duoshuo_commentmeta WHERE post_id = $postId";
 		$synced = $dsql->GetOne($sql);
 		if(is_array($synced)){//create操作的评论，没同步过才处理
-			return null;
+			return array();
 		}
-		if(!empty($meta['source_thread_id'])){
-			$aid = $meta['source_thread_id'];
+		if(!empty($meta['thread_key'])){
+			$aid = $meta['thread_key'];
 			$sql = "SELECT title FROM #@__archives WHERE id = $aid";
 			$thread = $dsql->GetOne($sql);
 			if(is_array($thread)){
 				//注意防止sql注入 title,author_name,message
 				$title = addslashes($thread['title']);
-				$sourceThreadId = $meta['source_thread_id'];
+				$threadKey = $meta['thread_key'];
 				$author_name = addslashes(iconv("UTF-8","GBK",trim(strip_tags($meta['author_name']))));
 				$ip = $meta['ip'];
 				$ischeck = self::$approvedMap[$meta['status']];
 				$dtime = strtotime($meta['created_at']);
 				$message = addslashes(iconv("UTF-8","GBK",strip_tags($meta['message'])));
 				$sql = "INSERT INTO #@__feedback (aid,typeid,username,arctitle,ip,ischeck,dtime,mid,bad,good,ftype,face,msg) VALUES ("
-				."$sourceThreadId,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
+				."$threadKey,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
 				$dsql->ExecuteNoneQuery($sql);
 				$last_id = $dsql->GetLastID();
 				$sql = "INSERT INTO duoshuo_commentmeta (post_id,cid) VALUES ($postId,$last_id)";
@@ -252,11 +252,8 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
 	public function refreshThreads($aidList){
 		foreach($aidList as $aid){
-			echo 0.3;
 			$arc = new Archives($aid);
-			echo 0.5;
 			$arc->MakeHtml();
-			echo 1;
 		}
 	}
 	

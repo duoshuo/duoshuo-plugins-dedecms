@@ -20,14 +20,27 @@
 		<td height="28" background="images/tbg.gif" colspan="8" style="padding-left:10px;">
 		<div style="float:left">
 			<b>多说开发者中心-帮助文档</b>
-			[<a style="font-size:13px" target="_blank" href="http://dev.duoshuo.com/docs/"><u>在新窗口中打开</u></a>]
+			[<a style="font-size:13px" target="_blank" href="http://dev.duoshuo.com/docs/dedecms/"><u>在新窗口中打开</u></a>]
 		</div>
 		</td>
 	</tr>
 </table>
-<iframe id="duoshuo-remote-window" src="http://dev.duoshuo.com/docs/" style="width:100%;border: 0 none;">
+<div style="width:98%;margin:0px auto;">
+<iframe id="duoshuo-remote-window" src="http://dev.duoshuo.com/docs/dedecms/" style="width:100%;border: 0 none;">
 </iframe>
+</div>
 
+
+<script>
+jQuery(function(){
+var $ = jQuery,
+	iframe = $('#duoshuo-remote-window'),
+	resetIframeHeight = function(){
+		iframe.height($(window).height() - iframe.offset().top - 70);
+	};
+resetIframeHeight();
+$(window).resize(resetIframeHeight);
+});
 </script>
 </body>
 </html>
