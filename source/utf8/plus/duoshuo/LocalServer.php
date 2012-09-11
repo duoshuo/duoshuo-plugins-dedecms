@@ -28,7 +28,7 @@ class Duoshuo_LocalServer{
 		
 		$last_sync = $this->plugin->getOption('last_sync');
 		
-		$limit = 50;
+		$limit = 20;
 		
 		$params = array(
 			'since_id' => $last_sync,

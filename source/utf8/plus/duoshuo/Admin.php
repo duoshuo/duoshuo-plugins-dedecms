@@ -19,7 +19,7 @@ class Duoshuo_Admin{
 	}
 	
 	function saveLocalConfig(){
-		$keys = array('short_name','secret','seo_enabled');
+		$keys = array('short_name','secret','seo_enabled','debug');
 		$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
 		
 		foreach ($keys as $key){
@@ -55,6 +55,24 @@ class Duoshuo_Admin{
 		}else{
 			Showmsg(DEDETEMPLATE.'/default/ajaxfeedback.bak.htm'.'不存在，请手动插入标签','./duoshuo.php?action=localConfig',0,2000);
 		}
+	}
+	
+	function export(){
+		AjaxHead();
+		header('Content-Type: application/json; charset=UTF-8');
+		$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
+		$response = $duoshuoPlugin->export();
+		echo json_encode($response);
+		exit();
+	}
+	
+	function syncLog(){
+		AjaxHead();
+		header('Content-Type: application/json; charset=UTF-8');
+		$duoshuoPlugin = Duoshuo_Dedecms::getInstance();
+		$response = $duoshuoPlugin->syncLog();
+		echo json_encode($response);
+		exit();
 	}
 	
 	function installStep1(){
