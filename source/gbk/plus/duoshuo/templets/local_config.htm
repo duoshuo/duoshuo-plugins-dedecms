@@ -10,6 +10,13 @@
 			$tag_replaced = true;
 		}
 	}
+	$progress = $duoshuoPlugin->getOption('synchronized');
+		
+	if (!$progress || is_numeric($progress)){//	之前已经完成了导出流程
+		$excuteExportString = "执行同步";
+	}else{
+		$excuteExportString = "继续未完成同步";
+	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -73,14 +80,51 @@
 	<tr>
 		<td height="28" background="images/tbg.gif" colspan="2" style="padding-left:10px;">
 			<div style="float:left">
+				<b>同步</b>
+			</div>
+		</td>
+	</tr>
+	<tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+		<td width="215px" align="right">同步本地数据到多说</td>
+		<td align="left" id="ds-export">
+			<span class="message-start"><input type="button" size="14" onclick="fireExport();return false;" value="<?php echo $excuteExportString;?>"></span>
+			<span class="status"></span>
+			<span class="message-complete">同步完成</span>
+			<span class="help-inline">同步后能显示原有评论。同步包含：原有评论数据，与评论相关的文章数据。</span>
+		</td>
+	</tr>
+	<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+		<td width="215px" align="right">备份多说中的评论到本地数据库</td>
+		<td align="left" id="ds-sync">
+			<span class="message-start"><input type="button" size="14" onclick="fireSyncLog();return false;" value="执行备份"></input></span>
+			<span class="status"></span>
+			<span class="message-complete">备份完成</span>
+			<span class="help-inline">插件开启了自动备份功能，仅当自动备份不正常时，需要执行手动备份。</span>
+		</td>
+	</tr>
+	<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+		<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="保存设置" /></td>
+	</tr>
+	<?php include_once dirname(__FILE__) . '/common-script.html';?>
+</table>
+<table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
+	<tr>
+		<td height="28" background="images/tbg.gif" colspan="2" style="padding-left:10px;">
+			<div style="float:left">
 				<b>本地设置</b>
 			</div>
 		</td>
 	</tr>
 	<form action="duoshuo.php" name="localConfig" method="post">
 		<input name="action" type="hidden" value="saveLocalConfig"/>
+		<tr bgcolor="#FFFFFF" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
+			<td width="215px" align="right">开启后台出错时显示错误内容</td>
+			<td align="left">
+			<input class="np" type="hidden" name="debug" value="0" />
+			<input class="np" type="checkbox" <?php echo $duoshuoPlugin->getOption('debug')? "checked='checked'" : ''; ?> name="debug" value="1" /><span class="help-inline">该功能仅在多说同步和备份出错时有效</span></td>
+		</tr>
 		<tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-			<td width="120px" align="right">开启SEO优化</td>
+			<td width="215px" align="right">开启SEO优化</td>
 			<td align="left">
 			<input class="np" type="hidden" name="seo_enabled" value="0" />
 			<input class="np" type="checkbox" <?php echo $duoshuoPlugin->getOption('seo_enabled')? "checked='checked'" : ''; ?> name="seo_enabled" value="1" /></td>
@@ -89,6 +133,7 @@
 			<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="保存设置" /></td>
 		</tr>
 	</form>
+	<?php include_once dirname(__FILE__) . '/common-script.html';?>
 </table>
 </body>
 </html>

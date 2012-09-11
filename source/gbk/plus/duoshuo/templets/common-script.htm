@@ -1,0 +1,105 @@
+<style>
+#ds-export{
+	margin-bottom:3em;
+}
+.message-complete, .ds-exported .message-start, .ds-exporting .message-start, .status,
+ .ds-synced .message-start, .ds-syncing .message-start{
+	display:none;
+}
+.ds-exported .message-complete, .message-start, .ds-exporting .status,
+.ds-synced .message-complete, .ds-syncing .status{
+	display:inline-block;
+}
+
+.help-inline{
+	margin-left:5px;
+	color: #555555;
+}
+</style>
+<script type="text/javascript">
+function fireSyncLog(progress){
+	var $ = jQuery;
+	$('#ds-sync .status').empty();//.removeClass('ds-export-fail').html('处理中...');
+	$('#ds-sync').addClass('ds-syncing');
+	$('#ds-sync .status').html('开始同步 <img src="/plus/duoshuo/images/waiting.gif" />');
+	syncProgress();
+	return false;
+}
+function fireExport(){
+	var $ = jQuery;
+	$('#ds-export .status').empty();//.removeClass('ds-export-fail').html('处理中...');
+	$('#ds-export').addClass('ds-exporting');
+	$('#ds-export .status').html('开始同步 <img src="/plus/duoshuo/images/waiting.gif" />');
+	exportProgress();
+	return false;
+}
+function duoshuoOnError(jqXHR, textStatus){
+	switch(textStatus){
+	case 'parsererror':
+		alert('解析错误，联系多说客服帮助解决问题：' + jqXHR.responseText);
+		break;
+	case "abort":
+		break;
+	case "notmodified":
+	case "error":
+	case "timeout":
+	default:
+		var dict = {
+			notmodified	: '没有变化',
+			error		: '出错了',
+			timeout		: '超时了'
+		};
+		alert(dict[textStatus] + ', 联系多说客服帮助解决问题');
+	}
+}
+function exportProgress(progress){
+	var $ = jQuery;
+	var rdigit = /\d/;
+	$.ajax({
+		url:'duoshuo.php',
+		data:{action: 'export'},
+		error:duoshuoOnError,
+		success:function(response) {
+			if (response.code == 0){
+				if (rdigit.test(response.progress) && !isNaN(response.progress)){
+					$('#ds-export').removeClass('ds-exporting').addClass('ds-exported');
+				}
+				else{
+					var lang = {'user':'用户', 'thread':'文章', 'post':'评论'}, progress = response.progress.split('/');
+					$('#ds-export .status').html('正在同步' + lang[progress[0]] + '/' + progress[1] + ' <img src="/plus/duoshuo/images/waiting.gif" />');
+					exportProgress();
+				}
+			}
+			else{
+				alert(response.errorMessage);
+			}
+		},
+		dataType:'json'
+	});
+}
+function syncProgress(progress){
+	var $ = jQuery;
+	var rdigit = /\d/;
+	$.ajax({
+		url:'duoshuo.php',
+		data:{action: 'syncLog'},
+		error:duoshuoOnError,
+		success:function(response) {
+			if (response.code == 0){
+				if (rdigit.test(response.progress) && !isNaN(response.progress)){
+					$('#ds-sync').removeClass('ds-syncing').addClass('ds-synced');
+				}
+				else{
+					var lang = {'user':'用户', 'thread':'文章', 'post':'评论'}, progress = response.progress.split('/');
+					$('#ds-sync .status').html('正在备份' + lang[progress[0]] + '/' + progress[1] + ' <img src="/plus/duoshuo/images/waiting.gif" />');
+					syncProgress();
+				}
+			}
+			else{
+				alert(response.errorMessage);
+			}
+		},
+		dataType:'json'
+	});
+}
+</script>

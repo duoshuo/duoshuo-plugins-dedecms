@@ -111,10 +111,25 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				'type'	=>	'int',
 			),
 			'seo_enabled'	=>	array(
-				'value'	=>	1,
+				'value'	=>	0,
 				'info'	=>	'开启SEO优化',
 				'type'	=>	'int',
 			),
+			'log_synced'	=>	array(
+				'value'	=>	0,
+				'info'	=>	'手动评论备份完成数(不累计)',
+				'type'	=>	'int',
+			),
+			'synchronized'	=>	array(
+				'value'	=>	'',
+				'info'	=>	'同步到多说完成进度',
+				'type'	=>	'string',
+			),
+			'debug'	=>	array(
+				'value'	=>	0,
+				'info'	=>	'是否显示出错消息(建议只在多说弹出错误提示时临时开启)',
+				'type'	=>	'int',
+			)
 		);
 		
 		//sync_to_local
@@ -147,7 +162,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	{
 		global $cfg_webname,$cfg_description,$cfg_basehost,$cfg_indexurl,$cfg_adminemail,$cur_url,$cfg_cli_time;
 		$params = array(
-			'name'			=>	iconv("GBK","UTF-8",$cfg_webname),
+			'name'			=>	htmlspecialchars_decode($cfg_webname),
 			'short_name'	=>	$this->options['short_name'],
 			'system'		=>	'dedecms',
 			'callback'		=>	self::currentUrl(),
@@ -188,11 +203,11 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				//注意防止sql注入 title,author_name,message
 				$title = addslashes($thread['title']);
 				$threadKey = $meta['thread_key'];
-				$author_name = addslashes(iconv("UTF-8","GBK",trim(strip_tags($meta['author_name']))));
+				$author_name = addslashes(trim(strip_tags($meta['author_name'])));
 				$ip = $meta['ip'];
 				$ischeck = self::$approvedMap[$meta['status']];
 				$dtime = strtotime($meta['created_at']);
-				$message = addslashes(iconv("UTF-8","GBK",strip_tags($meta['message'])));
+				$message = addslashes($meta['message']);
 				$sql = "INSERT INTO #@__feedback (aid,typeid,username,arctitle,ip,ischeck,dtime,mid,bad,good,ftype,face,msg) VALUES ("
 				."$threadKey,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
 				$dsql->ExecuteNoneQuery($sql);
@@ -253,31 +268,289 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	public function refreshThreads($aidList){
 		foreach($aidList as $aid){
 			$arc = new Archives($aid);
-			$arc->MakeHtml();
+			if($arc){
+				$arc->MakeHtml();
+			}
 		}
 	}
 	
-	public function userData($userId){	// null 代表当前登录用户，0代表游客
-		if ($userId === null)
-			$current_user = wp_get_current_user();
-		elseif($userId != 0)
-			$current_user = get_user_by( 'id', $userId);
+	/**
+	 * 将文章和评论内容同步到多说，用于以前的评论显示和垃圾评论过滤
+	 */
+	public function export(){
+		global $dsql;
 		
-		if (isset($current_user) && $current_user->ID) {
-			$avatar_tag = get_avatar($current_user->ID);
-			$avatar_data = array();
-			preg_match('/(src)=((\'|")[^(\'|")]*(\'|"))/i', $avatar_tag, $avatar_data);
-			$avatar = str_replace(array('"', "'"), '', $avatar_data[2]);
+		@set_time_limit(0);
+		@ini_set('memory_limit', '256M');
+		@ini_set('display_errors', $this->getOption('debug'));
+		
+		$progress = $this->getOption('synchronized');
+		
+		if (!$progress || is_numeric($progress))//	之前已经完成了导出流程
+			$progress = 'thread/0';
+		
+		list($type, $offset) = explode('/', $progress);
+		
+		try{
+			switch($type){
+				case 'thread':
+					$limit = 10;
+					$dsql->SetQuery("SELECT aid FROM `#@__feedback` where `aid` > $offset group by aid order by aid asc limit $limit");
+					$dsql->Execute();
+					$aidArray = array();
+					while($row = $dsql->GetArray())
+					{
+						$aidArray[] = $row['aid'];
+						
+					}
+					if(count($aidArray)>0){
+						$aids = implode(',', $aidArray);
+						$dsql->SetQuery("SELECT * FROM `#@__archives` where `id` in ($aids)");
+						$dsql->Execute();
+						$threads = array();
+						while($row = $dsql->GetArray())
+						{
+							$arc = new Archives($row['id']);
+							$threads[] = $arc->Fields;
+						}
+						$count = $this->exportThreads($threads);
+					}else{
+						$count = 0;
+					} 
+					break;
+				case 'post':
+					$limit = 50;
+					$dsql->SetQuery("SELECT cid FROM `duoshuo_commentmeta` group by cid");
+					$dsql->Execute();
+					$cidFromDuoshuo = array();
+					while($row = $dsql->GetArray())
+					{
+						$cidFromDuoshuo[] = $row['cid'];
+					}
+					$dsql->SetQuery("SELECT * FROM `#@__feedback` order by id asc limit $offset,$limit ");
+					$dsql->Execute();
+					$comments = array();
+					while($row = $dsql->GetArray())
+					{
+						$comments[] = $row;
+					}
+					$count = $this->exportPosts($comments,$cidFromDuoshuo);
+					break;
+				default:
+			}
 			
-			return array(
-				'id' => $current_user->ID,
-				'name' => $current_user->display_name,
-				'avatar' => $avatar,
-				'email' => $current_user->user_email,
+			if ($count == $limit){
+				$progress = $type . '/' . ($offset + $limit);
+			}
+			elseif($type == 'thread')
+				$progress = 'post/0';
+			elseif($type == 'post')
+				$progress = time();
+			
+			$this->updateOption('synchronized', $progress);
+			$response = array(
+				'progress'=>$progress,
+				'code'	=>	0
 			);
+			return $response;
 		}
-		else{
-			return array();
+		catch(Duoshuo_Exception $e){
+			$this->sendException($e);
 		}
+	}
+	
+	/**
+	 * 从服务器pull评论到本地 用于dede后台手动同步的ajax请求
+	 *
+	 * @param array $input
+	 */
+	public function syncLog(){
+		$syncLock = $this->getOption('sync_lock');//检查是否正在同步评论 同步完成后该值会置0
+		if(!isset($syncLock) || $syncLock > time()- 900){//正在或15分钟内发生过写回但没置0
+			$response = array(
+					'code'	=>	Duoshuo_Exception::SUCCESS,
+					'response'=> '同步中，最近同步启动时间：'.$this->timeFormat($syncLock),
+			);
+			return;
+		}
+	
+		$this->updateOption('sync_lock',  time());
+	
+		$last_sync = $this->getOption('last_sync');
+		
+		$log_synced = $this->getOption('log_synced');
+		
+		$limit = 1;
+	
+		$params = array(
+				'since_id' => $last_sync,
+				'limit' => $limit,
+				'order' => 'asc',
+		);
+	
+		$client = $this->getClient();
+	
+		$posts = array();
+		$affectedThreads = array();
+		$max_sync_id = 0;
+	
+		$response = $client->getLogList($params);
+	
+		$count = count($response['response']);
+			
+		foreach($response['response'] as $log){
+			switch($log['action']){
+				case 'create':
+					$affected = $this->createPost($log['meta']);
+					break;
+				case 'approve':
+				case 'spam':
+				case 'delete':
+					$affected = $this->moderatePost($log['action'], $log['meta']);
+					break;
+				case 'delete-forever':
+					$affected = $this->deleteForeverPost($log['meta']);
+					break;
+				case 'update'://现在并没有update操作的逻辑
+				default:
+					$affected = array();
+			}
+			//合并
+
+			$affectedThreads = array_merge($affectedThreads, $affected);
+				
+			if ($log['log_id'] > $max_sync_id)
+				$max_sync_id = $log['log_id'];
+		}
+			
+		$params['since_id'] = $max_sync_id;
+	
+		//唯一化
+		$aidList = array_unique($affectedThreads);
+	
+		if ($max_sync_id > $last_sync)
+			$this->updateOption('last_sync', $max_sync_id);
+	
+		$this->updateOption('sync_lock',  0);
+	
+		//更新静态文件
+		if ($this->getOption('seo_enabled'))
+			$this->refreshThreads($aidList);
+	
+		$this->updateOption('sync_lock', 1);
+		
+		if($count == $limit){//如果返回和最大请求条数一致，则再取一次
+			$progress = 'post/'.($log_synced + $count);
+			$this->updateOption('log_synced', $log_synced + $count);
+		}else{
+			$progress = time();
+			$this->updateOption('log_synced', 0);
+		}
+		$response = array(
+				'progress'=>$progress,
+				'code'	=>	0
+		);
+		return $response;
+	}
+	
+	function exportThreads($threads){
+		if (count($threads) === 0)
+			return 0;
+	
+		$params = array(
+				'threads'	=>	array(),
+		);
+		foreach($threads as $index => $thread){
+			$params['threads'][] = $this->packageThread($thread);
+		}
+	
+		$remoteResponse = $this->getClient()->request('POST','threads/import', $params);
+	
+		return count($threads);
+	}
+	
+	function exportPosts($posts,$postIdsFromDuoshuo){
+		if (count($posts) === 0)
+			return 0;
+	
+		$params = array(
+				'posts'	=>	array()
+		);
+	
+		foreach($posts as $comment){
+			if(!in_array($comment['id'],$postIdsFromDuoshuo))
+				$params['posts'][] = $this->packagePost($comment);
+		}
+		if(count($params['posts']) > 0){
+			$remoteResponse = $this->getClient()->request('POST', 'posts/import', $params);
+		}
+		return count($posts);
+	}
+	
+	public function timeFormat($time) {
+		return date('Y-m-d H:i:s', $time);
+	}
+	
+	public function statusFormat($status) {
+		switch($status) {
+			case 1 : return 'approved';
+			case 0 : return 'pending';
+		}
+	}
+	
+	public function getTables() {
+		return array(
+			'thread'	=>	array('archives'),
+			'post'		=>	array('feedback')
+		);
+	}
+
+	public function packagePost($post) {
+		return array(
+			'post_key'	=>	$post['id'],
+			'thread_key'	=>	$post['aid'],
+			'author_key'	=>	$post['mid'],
+			'author_name'		=>	$post['username'],
+			'created_at'		=>	$this->timeFormat($post['dtime']),
+			'ip'			=>	$post['ip'],
+			'status'		=>	$this->statusFormat($post['ischeck']),
+			'message'		=>	$post['msg'],
+			'likes'			=>	$post['good'],
+			'dislikes'		=>	$post['bad']
+		);
+	}
+
+	public function packageThread($thread) {
+		$data = array(
+			'thread_key'	=>	$thread['id'],
+			'title'			=>	$thread['title'],
+			'created_at'		=>	$this->timeFormat($thread['pubdate']),
+			'author_key'	=>	$thread['mid'],
+			'updated_at'		=>	$this->timeFormat($thread['lastpost']),
+			'likes'			=>	$thread['goodpost'],
+			'dislikes'		=>	$thread['badpost'],
+			'excerpt'		=>	$thread['description'],
+			'ip'			=>	$thread['userip'],
+			'url'			=>	'',
+		);
+		if(isset($thread['body']))
+			$data['content'] = $thread['body'];
+		else if(isset($thread['introduce']))
+			$data['content'] = $thread['introduce'];
+		else 
+			$data['content'] = '';
+		
+		$data['meta'] = json_encode($this->myUnset($thread, array('id', 'title', 'pubdate', 'mid', 'lastpost',
+									'goodpost', 'badpost', 'description', 'userip', 'body', 'introduce')));
+		return $data;
+	}
+	
+	public function myUnset($data, $keys) {
+		if(!is_array($data)) return array();
+		foreach($keys as $key) {
+			if(isset($data[$key]))
+				unset($data[$key]);
+		}
+		return $data;
 	}
 }
