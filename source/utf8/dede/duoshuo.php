@@ -10,6 +10,7 @@
 
 require_once(dirname(__FILE__)."/config.php");
 require_once(DEDEINC."/json.class.php");
+require_once(DEDEINC.'/arc.archives.class.php');
 
 require_once(DEDEROOT.'/plus/duoshuo.php');
 require_once(DEDEROOT.'/plus/duoshuo/Admin.php');

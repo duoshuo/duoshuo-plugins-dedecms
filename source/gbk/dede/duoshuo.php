@@ -10,6 +10,7 @@
 
 require_once(dirname(__FILE__)."/config.php");
 require_once(DEDEINC."/json.class.php");
+require_once(DEDEINC.'/arc.archives.class.php');
 
 require_once(DEDEROOT.'/plus/duoshuo.php');
 require_once(DEDEROOT.'/plus/duoshuo/Admin.php');
@@ -17,16 +18,6 @@ require_once(DEDEROOT.'/plus/duoshuo/Admin.php');
 $duoshuoPlugin = Duoshuo_Dedecms::getInstance();
 // 设置默认参数
 $duoshuoPlugin->checkDefaultSettings();
-
-
-//从服务器返回的注册结果
-if(!empty($_GET) && isset($_GET['duoshuo_connect_site']) && isset($_GET['short_name']) && isset($_GET['secret'])){
-	$keys = array('short_name','secret');
-	foreach ($keys as $key){
-		$duoshuoPlugin->updateOption($key,$_GET[$key]);
-	}
-	$action = 'installStep1';
-}
 
 //兼容0.1.x版本插件 引入多说配置文件 {{ 只用于 0.2.x
 $configFile =  DEDEDATA.'/duoshuo.inc.php';
@@ -51,6 +42,15 @@ if(file_exists($configFile)){
 	}
 }
 //}}
+
+//从服务器返回的注册结果
+if(!empty($_GET) && isset($_GET['duoshuo_connect_site']) && isset($_GET['short_name']) && isset($_GET['secret'])){
+	$keys = array('short_name','secret');
+	foreach ($keys as $key){
+		$duoshuoPlugin->updateOption($key,$_GET[$key]);
+	}
+	$action = 'installStep1';
+}
 
 if($duoshuoPlugin->getOption('short_name') == '' || $duoshuoPlugin->getOption('secret') == ''){
 	$params = $duoshuoPlugin->packageOptions();
