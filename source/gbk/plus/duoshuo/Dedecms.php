@@ -311,6 +311,12 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 						while($row = $dsql->GetArray())
 						{
 							$arc = new Archives($row['id']);
+							$arc->Fields['arcurl'] = GetFileUrl(
+								$arc->ArcID,$arc->Fields['typeid'],$arc->Fields["senddate"],
+								$arc->Fields["title"],$arc->Fields["ismake"],
+								$arc->Fields["arcrank"],$arc->TypeLink->TypeInfos['namerule'],$arc->TypeLink->TypeInfos['typedir'],$arc->Fields["money"],$arc->Fields['filename'],
+								$arc->TypeLink->TypeInfos['moresite'],$arc->TypeLink->TypeInfos['siteurl'],$arc->TypeLink->TypeInfos['sitepath']
+							);
 							$threads[] = $arc->Fields;
 						}
 						$count = $this->exportThreads($threads);
@@ -522,6 +528,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	}
 
 	public function packageThread($thread) {
+		global $cfg_basehost,$cfg_cmspath;
 		$data = array(
 			'thread_key'	=>	$thread['id'],
 			'title'			=>	iconv("GBK","UTF-8",$thread['title']),
@@ -532,7 +539,6 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			'dislikes'		=>	$thread['badpost'],
 			'excerpt'		=>	iconv("GBK","UTF-8",$thread['description']),
 			'ip'			=>	$thread['userip'],
-			'url'			=>	$thread['arcurl'],
 			'source'		=>	'dedecms',
 		);
 		if(isset($thread['body']))
@@ -541,8 +547,21 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			$data['content'] = iconv("GBK","UTF-8",$thread['introduce']);
 		else 
 			$data['content'] = '';
-		if(!empty($thread['litpic'])){
-			$data['thumbnail'] = $thread['litpic'];
+		if(!empty($thread['arcurl'])){
+			if(strpos($thread['arcurl'],$cfg_basehost)){
+				$data['url'] = $thread['arcurl'];
+			}
+			else{
+				$data['url'] = $cfg_basehost.$cfg_cmspath.$thread['arcurl'];
+			}
+		}
+		if(!empty($thread['litpic'])  && !preg_match('/\/images\/defaultpic.gif/',$thread['litpic'])){
+			if(preg_match('/http:\/\//',$thread['litpic'])){
+				$data['images'] = json_encode(array($thread['litpic']));
+			}else{
+				$data['images'] = json_encode(array($cfg_basehost.$cfg_cmspath.$thread['litpic']));
+			}
+			
 		}
 		$data['meta'] = json_encode($this->myUnset($thread, array('id', 'title', 'pubdate', 'mid', 'lastpost','litpic','arcurl',
 									'goodpost', 'badpost', 'description', 'userip', 'body', 'introduce')));
