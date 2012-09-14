@@ -162,14 +162,14 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	{
 		global $cfg_webname,$cfg_description,$cfg_basehost,$cfg_indexurl,$cfg_adminemail,$cur_url,$cfg_cli_time;
 		$params = array(
-			'name'			=>	htmlspecialchars_decode($cfg_webname),
+			'name'			=>	htmlspecialchars_decode(iconv("GBK","UTF-8",$cfg_webname)),
 			'short_name'	=>	$this->options['short_name'],
 			'system'		=>	'dedecms',
 			'callback'		=>	self::currentUrl(),
-			'local_api_url' => $cfg_basehost.'/plus/duoshuo/api.php',
+			'local_api_url' => $cfg_basehost.$cfg_cmspath.'/plus/duoshuo/api.php',
 			'plugin_version' => self::VERSION,
-			'url'			=>	$cfg_basehost.$cfg_indexurl,
-			'siteurl'		=>	$cfg_basehost,
+			'url'			=>	$cfg_basehost.$cfg_cmspath.$cfg_indexurl,
+			'siteurl'		=>	$cfg_basehost.$cfg_cmspath,
 			'admin_email'	=>	$cfg_adminemail,
 			'timezone'		=>	'UTC' . ($cfg_cli_time>=0 ? '+' : '') . $cfg_cli_time,
 			'sync_log'		=>	'1',
@@ -203,11 +203,11 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				//×¢Òâ·ÀÖ¹sql×¢Èë title,author_name,message
 				$title = addslashes($thread['title']);
 				$threadKey = $meta['thread_key'];
-				$author_name = addslashes(trim(strip_tags($meta['author_name'])));
+				$author_name = addslashes(iconv("UTF-8","GBK",trim(strip_tags($meta['author_name']))));
 				$ip = $meta['ip'];
 				$ischeck = self::$approvedMap[$meta['status']];
 				$dtime = strtotime($meta['created_at']);
-				$message = addslashes($meta['message']);
+				$message = addslashes(iconv("UTF-8","GBK",strip_tags($meta['message'])));
 				$sql = "INSERT INTO #@__feedback (aid,typeid,username,arctitle,ip,ischeck,dtime,mid,bad,good,ftype,face,msg) VALUES ("
 				."$threadKey,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
 				$dsql->ExecuteNoneQuery($sql);
@@ -355,6 +355,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			return $response;
 		}
 		catch(Duoshuo_Exception $e){
+			$this->updateOption('synchronized', $progress);
 			$this->sendException($e);
 		}
 	}
@@ -510,11 +511,11 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			'post_key'	=>	$post['id'],
 			'thread_key'	=>	$post['aid'],
 			'author_key'	=>	$post['mid'],
-			'author_name'		=>	$post['username'],
-			'created_at'		=>	$this->timeFormat($post['dtime']),
+			'author_name'	=>	iconv("GBK","UTF-8",$post['username']),
+			'created_at'	=>	$this->timeFormat($post['dtime']),
 			'ip'			=>	$post['ip'],
 			'status'		=>	$this->statusFormat($post['ischeck']),
-			'message'		=>	$post['msg'],
+			'message'		=>	iconv("GBK","UTF-8",$post['msg']),
 			'likes'			=>	$post['good'],
 			'dislikes'		=>	$post['bad']
 		);
@@ -523,24 +524,27 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	public function packageThread($thread) {
 		$data = array(
 			'thread_key'	=>	$thread['id'],
-			'title'			=>	$thread['title'],
-			'created_at'		=>	$this->timeFormat($thread['pubdate']),
+			'title'			=>	iconv("GBK","UTF-8",$thread['title']),
+			'created_at'	=>	$this->timeFormat($thread['pubdate']),
 			'author_key'	=>	$thread['mid'],
-			'updated_at'		=>	$this->timeFormat($thread['lastpost']),
+			'updated_at'	=>	$this->timeFormat($thread['lastpost']),
 			'likes'			=>	$thread['goodpost'],
 			'dislikes'		=>	$thread['badpost'],
-			'excerpt'		=>	$thread['description'],
+			'excerpt'		=>	iconv("GBK","UTF-8",$thread['description']),
 			'ip'			=>	$thread['userip'],
-			'url'			=>	'',
+			'url'			=>	$thread['arcurl'],
+			'source'		=>	'dedecms',
 		);
 		if(isset($thread['body']))
-			$data['content'] = $thread['body'];
+			$data['content'] = iconv("GBK","UTF-8",$thread['body']);
 		else if(isset($thread['introduce']))
-			$data['content'] = $thread['introduce'];
+			$data['content'] = iconv("GBK","UTF-8",$thread['introduce']);
 		else 
 			$data['content'] = '';
-		
-		$data['meta'] = json_encode($this->myUnset($thread, array('id', 'title', 'pubdate', 'mid', 'lastpost',
+		if(!empty($thread['litpic'])){
+			$data['thumbnail'] = $thread['litpic'];
+		}
+		$data['meta'] = json_encode($this->myUnset($thread, array('id', 'title', 'pubdate', 'mid', 'lastpost','litpic','arcurl',
 									'goodpost', 'badpost', 'description', 'userip', 'body', 'introduce')));
 		return $data;
 	}

@@ -1,9 +1,10 @@
 <?php if(!defined('DEDEINC')) exit('Request Error!');
 require_once(DEDEROOT.'/plus/duoshuo.php');
 require_once(DEDEROOT.'/include/taglib/feedback.lib.php');
+
 function lib_duoshuo(&$ctag,&$refObj)
 {
-	global $dsql,$envs,$cfg_phpurl,$cfg_basehost,$cfg_multi_site;
+	global $dsql,$cfg_basehost,$cfg_cmspath;
 	
 	$plugin = Duoshuo_Dedecms::getInstance();
 	
@@ -19,11 +20,36 @@ function lib_duoshuo(&$ctag,&$refObj)
 	}
 	$arcid = $refObj->Fields['aid'];
 	
+	//设置参数
 	$attrs = array();
 	$attrs[] = ' data-thread-key="'.$arcid.'"';
-	if(!empty($refObj->Fields['title'])){
-		$attrs[] = 'data-title="'.htmlspecialchars($refObj->Fields['title'],ENT_QUOTES).'"';
+	
+	if(strpos($refObj->Fields['arcurl'],$cfg_basehost)){
+		$attrs[] = ' data-url="'.$refObj->Fields['arcurl'].'"';
 	}
+	else{
+		$attrs[] = ' data-url="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['arcurl'].'"';
+	}
+	if(!empty($refObj->Fields['litpic'])){
+		if(preg_match('/http:\/\//',$refObj->Fields['litpic'])){
+			$attrs[] = ' data-thumbnail="'.$refObj->Fields['litpic'].'"';
+		}else{
+			$attrs[] = ' data-thumbnail="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['litpic'].'"';
+		}
+	}
+	if(!empty($refObj->Fields['picname'])){
+		if(preg_match('/http:\/\//',$refObj->Fields['picname'])){
+			$attrs[] = ' data-image="'.$refObj->Fields['picname'].'"';
+		}else{
+			$attrs[] = ' data-image="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['picname'].'"';
+		}
+	}
+	
+	if(!empty($refObj->Fields['title'])){
+		$attrs[] = 'data-title="'.htmlspecialchars($refObj->Fields['title'],ENT_QUOTES,'GB2312').'"';
+	}
+	
+	//输出评论框
 	ob_start();
 	require (DEDEROOT.'/plus/duoshuo/templets/comments.htm');
 	

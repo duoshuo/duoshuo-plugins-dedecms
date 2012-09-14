@@ -13,14 +13,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
 <title>多说评论管理</title>
-<script language="javascript" src="../include/js/jquery/jquery.js"></script>
-<script language="javascript" src="../include/js/dedeajax2.js"></script>
-<link href="css/base.css" rel="stylesheet" type="text/css" />
+<script language="javascript" src="../plus/duoshuo/js/jquery-1.7.2.min.js"></script>
+<link href="<?php echo CSSPATH?>/base.css" rel="stylesheet" type="text/css" />
 </head>
-<body background="images/allbg.gif" leftmargin="8" topmargin="8">
+<body background="<?php echo IMAGEPATH;?>/allbg.gif" leftmargin="8" topmargin="8">
 <table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6">
 	<tr>
-		<td height="28" background="images/tbg.gif" colspan="8" style="padding-left:10px;">
+		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" colspan="8" style="padding-left:10px;">
 		<div style="float:left">
 			<b>多说管理后台</b>
 			[<a style="font-size:13px" target="_blank" href="<?php echo 'http://' . $duoshuoPlugin->getOption('short_name') . '.' . Duoshuo_Abstract::DOMAIN.'/'.$adminPath;?>"><u>在新窗口中打开</u></a>]

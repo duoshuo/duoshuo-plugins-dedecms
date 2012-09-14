@@ -23,14 +23,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
 <title>多说评论管理</title>
-<script language="javascript" src="../include/js/jquery/jquery.js"></script>
-<script language="javascript" src="../include/js/dedeajax2.js"></script>
-<link href="css/base.css" rel="stylesheet" type="text/css" />
+<script language="javascript" src="../plus/duoshuo/js/jquery-1.7.2.min.js"></script>
+<link href="<?php echo CSSPATH;?>/base.css" rel="stylesheet" type="text/css" />
 </head>
-<body background="images/allbg.gif" leftmargin="8" topmargin="8">
+<body background="<?php echo IMAGEPATH;?>/allbg.gif" leftmargin="8" topmargin="8">
 <table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
 	<tr>
-		<td height="28" background="images/tbg.gif" style="padding-left:10px;">
+		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" style="padding-left:10px;">
 			<div style="float:left">
 				<b>自动替换原始评论框</b>
 			</div>
@@ -58,7 +57,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td height="28" background="images/tbg.gif" style="padding-left:10px;">
+		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" style="padding-left:10px;">
 			<div style="float:left">
 				<b>如果自动替换原始评论框无效或需要手动插入评论框</b>
 			</div>
@@ -78,7 +77,7 @@
 </table>
 <table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
 	<tr>
-		<td height="28" background="images/tbg.gif" colspan="2" style="padding-left:10px;">
+		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" colspan="2" style="padding-left:10px;">
 			<div style="float:left">
 				<b>同步</b>
 			</div>
@@ -102,14 +101,11 @@
 			<span class="help-inline">插件开启了自动备份功能，仅当自动备份不正常时，需要执行手动备份。</span>
 		</td>
 	</tr>
-	<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-		<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="保存设置" /></td>
-	</tr>
 	<?php include_once dirname(__FILE__) . '/common-script.html';?>
 </table>
 <table width="98%" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#D6D6D6" style="margin-bottom:6px">
 	<tr>
-		<td height="28" background="images/tbg.gif" colspan="2" style="padding-left:10px;">
+		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" colspan="2" style="padding-left:10px;">
 			<div style="float:left">
 				<b>本地设置</b>
 			</div>
@@ -133,7 +129,7 @@
 			<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="保存设置" /></td>
 		</tr>
 	</form>
-	<?php include_once dirname(__FILE__) . '/common-script.html';?>
+	<?php include_once dirname(__FILE__) . '/common-script.htm';?>
 </table>
 </body>
 </html>
