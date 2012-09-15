@@ -2,7 +2,7 @@
 
 class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
-	const VERSION = '0.2.0';
+	const VERSION = '0.2.1';
 	
 	public static $commentTag = '{dede:duoshuo/}';
 	
@@ -166,10 +166,10 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			'short_name'	=>	$this->options['short_name'],
 			'system'		=>	'dedecms',
 			'callback'		=>	self::currentUrl(),
-			'local_api_url' => $cfg_basehost.'/plus/duoshuo/api.php',
+			'local_api_url' => $cfg_basehost.$cfg_cmspath.'/plus/duoshuo/api.php',
 			'plugin_version' => self::VERSION,
-			'url'			=>	$cfg_basehost.$cfg_indexurl,
-			'siteurl'		=>	$cfg_basehost,
+			'url'			=>	$cfg_basehost.$cfg_cmspath.$cfg_indexurl,
+			'siteurl'		=>	$cfg_basehost.$cfg_cmspath,
 			'admin_email'	=>	$cfg_adminemail,
 			'timezone'		=>	'UTC' . ($cfg_cli_time>=0 ? '+' : '') . $cfg_cli_time,
 			'sync_log'		=>	'1',
@@ -311,6 +311,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 						while($row = $dsql->GetArray())
 						{
 							$arc = new Archives($row['id']);
+							$arc->Fields['arcurl'] = $arc->GetTrueUrl(null);
 							$threads[] = $arc->Fields;
 						}
 						$count = $this->exportThreads($threads);
@@ -355,6 +356,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			return $response;
 		}
 		catch(Duoshuo_Exception $e){
+			$this->updateOption('synchronized', $progress);
 			$this->sendException($e);
 		}
 	}
@@ -380,7 +382,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		
 		$log_synced = $this->getOption('log_synced');
 		
-		$limit = 1;
+		$limit = 20;
 	
 		$params = array(
 				'since_id' => $last_sync,
@@ -510,8 +512,8 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			'post_key'	=>	$post['id'],
 			'thread_key'	=>	$post['aid'],
 			'author_key'	=>	$post['mid'],
-			'author_name'		=>	$post['username'],
-			'created_at'		=>	$this->timeFormat($post['dtime']),
+			'author_name'	=>	$post['username'],
+			'created_at'	=>	$this->timeFormat($post['dtime']),
 			'ip'			=>	$post['ip'],
 			'status'		=>	$this->statusFormat($post['ischeck']),
 			'message'		=>	$post['msg'],
@@ -521,17 +523,18 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	}
 
 	public function packageThread($thread) {
+		global $cfg_basehost,$cfg_cmspath;
 		$data = array(
 			'thread_key'	=>	$thread['id'],
 			'title'			=>	$thread['title'],
-			'created_at'		=>	$this->timeFormat($thread['pubdate']),
+			'created_at'	=>	$this->timeFormat($thread['pubdate']),
 			'author_key'	=>	$thread['mid'],
-			'updated_at'		=>	$this->timeFormat($thread['lastpost']),
+			'updated_at'	=>	$this->timeFormat($thread['lastpost']),
 			'likes'			=>	$thread['goodpost'],
 			'dislikes'		=>	$thread['badpost'],
 			'excerpt'		=>	$thread['description'],
 			'ip'			=>	$thread['userip'],
-			'url'			=>	'',
+			'source'		=>	'dedecms',
 		);
 		if(isset($thread['body']))
 			$data['content'] = $thread['body'];
@@ -540,6 +543,22 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		else 
 			$data['content'] = '';
 		
+		if(!empty($thread['arcurl'])){
+			if(strpos($thread['arcurl'],$cfg_basehost)){
+				$data['url'] = $thread['arcurl'];
+			}
+			else{
+				$data['url'] = $cfg_basehost.$cfg_cmspath.$thread['arcurl'];
+			}
+		}
+		if(!empty($thread['litpic'])  && !preg_match('/\/images\/defaultpic.gif/',$thread['litpic'])){
+			if(preg_match('/http:\/\//',$thread['litpic'])){
+				$data['images'] = json_encode(array($thread['litpic']));
+			}else{
+				$data['images'] = json_encode(array($cfg_basehost.$cfg_cmspath.$thread['litpic']));
+			}
+			
+		}
 		$data['meta'] = json_encode($this->myUnset($thread, array('id', 'title', 'pubdate', 'mid', 'lastpost',
 									'goodpost', 'badpost', 'description', 'userip', 'body', 'introduce')));
 		return $data;

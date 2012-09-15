@@ -61,6 +61,20 @@ if($duoshuoPlugin->getOption('short_name') == '' || $duoshuoPlugin->getOption('s
 
 $duoshuoAdmin = new Duoshuo_Admin();
 
+//版本检查，5.7及之后使用css/base.css
+$versionArray = array();
+preg_match('/V(\d+)_?/',$duoshuoAdmin->getGlobal('version'),$versionArray);
+if(isset($versionArray[1]) && $versionArray[1] > 56)
+{
+	define('CSSPATH', 'css');
+	define('IMAGEPATH', 'images');
+}else
+{
+	define('CSSPATH', 'img');
+	define('IMAGEPATH', 'img');
+}
+
+//执行操作
 if(isset($action)){
 	if (method_exists( $duoshuoAdmin, $action ) === TRUE){
 		$duoshuoAdmin->$action();

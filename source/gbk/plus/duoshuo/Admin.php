@@ -1,6 +1,7 @@
 <?php 
 
 class Duoshuo_Admin{
+	
 	function manageComments(){
 		$adminPath = 'admin/';
 		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';

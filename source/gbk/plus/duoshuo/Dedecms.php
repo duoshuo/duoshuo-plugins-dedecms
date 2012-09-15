@@ -2,7 +2,7 @@
 
 class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
-	const VERSION = '0.2.0';
+	const VERSION = '0.2.1';
 	
 	public static $commentTag = '{dede:duoshuo/}';
 	
@@ -311,12 +311,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 						while($row = $dsql->GetArray())
 						{
 							$arc = new Archives($row['id']);
-							$arc->Fields['arcurl'] = GetFileUrl(
-								$arc->ArcID,$arc->Fields['typeid'],$arc->Fields["senddate"],
-								$arc->Fields["title"],$arc->Fields["ismake"],
-								$arc->Fields["arcrank"],$arc->TypeLink->TypeInfos['namerule'],$arc->TypeLink->TypeInfos['typedir'],$arc->Fields["money"],$arc->Fields['filename'],
-								$arc->TypeLink->TypeInfos['moresite'],$arc->TypeLink->TypeInfos['siteurl'],$arc->TypeLink->TypeInfos['sitepath']
-							);
+							$arc->Fields['arcurl'] = $arc->GetTrueUrl(null);
 							$threads[] = $arc->Fields;
 						}
 						$count = $this->exportThreads($threads);
@@ -387,7 +382,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		
 		$log_synced = $this->getOption('log_synced');
 		
-		$limit = 1;
+		$limit = 20;
 	
 		$params = array(
 				'since_id' => $last_sync,

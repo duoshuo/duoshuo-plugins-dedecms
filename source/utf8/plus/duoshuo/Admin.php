@@ -1,6 +1,7 @@
 <?php 
 
 class Duoshuo_Admin{
+	
 	function manageComments(){
 		$adminPath = 'admin/';
 		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
@@ -79,4 +80,15 @@ class Duoshuo_Admin{
 		require DEDEROOT.'/plus/duoshuo/templets/replace_tag.htm';
 	}
 	
+	function getGlobal($key)
+	{
+		if(isset($GLOBALS[$key]))
+			return $GLOBALS[$key];
+		else if(isset($GLOBALS['kw_'.$key]))
+			return $GLOBALS['kw_'.$key];
+		else if(isset($GLOBALS['cfg_'.$key]))
+			return $GLOBALS['cfg_'.$key];
+		else
+			return false;
+	}
 }

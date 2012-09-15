@@ -23,26 +23,21 @@ function lib_duoshuo(&$ctag,&$refObj)
 	//ÉèÖÃ²ÎÊý
 	$attrs = array();
 	$attrs[] = ' data-thread-key="'.$arcid.'"';
-	
+	$attrs[] = 'data-author-key="'.$refObj->Fields["mid"].'"';
 	if(empty($refObj->Fields['arcurl'])){
-		$refObj->Fields['arcurl'] = GetFileUrl(
-				$refObj->ArcID,$refObj->Fields['typeid'],$refObj->Fields["senddate"],
-				$refObj->Fields["title"],$refObj->Fields["ismake"],
-				$refObj->Fields["arcrank"],$refObj->TypeLink->TypeInfos['namerule'],$refObj->TypeLink->TypeInfos['typedir'],$refObj->Fields["money"],$refObj->Fields['filename'],
-				$refObj->TypeLink->TypeInfos['moresite'],$refObj->TypeLink->TypeInfos['siteurl'],$refObj->TypeLink->TypeInfos['sitepath']
-		);
+		$refObj->Fields['arcurl'] = $refObj->GetTrueUrl(null);
 	}
-	if(strpos($refObj->Fields['arcurl'],$cfg_basehost)){
-		$attrs[] = ' data-url="'.$refObj->Fields['arcurl'].'"';
-	}
-	else{
+	if(strpos($refObj->Fields['arcurl'],$cfg_basehost) === false){
 		$attrs[] = ' data-url="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['arcurl'].'"';
 	}
-	if(!empty($refObj->Fields['picname']) && !preg_match('/\/images\/defaultpic.gif/',$refObj->Fields['litpic'])){
-		if(preg_match('/http:\/\//',$refObj->Fields['picname'])){
-			$attrs[] = ' data-image="'.$refObj->Fields['picname'].'"';
+	else{
+		$attrs[] = ' data-url="'.$refObj->Fields['arcurl'].'"';
+	}
+	if(!empty($refObj->Fields['litpic']) && !preg_match('/\/images\/defaultpic.gif/',$refObj->Fields['litpic'])){
+		if(preg_match('/http:\/\//',$refObj->Fields['litpic'])){
+			$attrs[] = ' data-image="'.$refObj->Fields['litpic'].'"';
 		}else{
-			$attrs[] = ' data-image="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['picname'].'"';
+			$attrs[] = ' data-image="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['litpic'].'"';
 		}
 	}
 	
