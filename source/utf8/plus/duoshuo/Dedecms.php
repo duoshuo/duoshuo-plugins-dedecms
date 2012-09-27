@@ -367,6 +367,9 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	 * @param array $input
 	 */
 	public function syncLog(){
+		
+		@ini_set('display_errors', $this->getOption('debug'));
+		
 		$syncLock = $this->getOption('sync_lock');//检查是否正在同步评论 同步完成后该值会置0
 		if(!isset($syncLock) || $syncLock > time()- 900){//正在或15分钟内发生过写回但没置0
 			$response = array(
