@@ -2,7 +2,7 @@
 
 class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
-	const VERSION = '0.2.1';
+	const VERSION = '0.3.0';
 	
 	public static $commentTag = '{dede:duoshuo/}';
 	
@@ -111,7 +111,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				'type'	=>	'int',
 			),
 			'seo_enabled'	=>	array(
-				'value'	=>	0,
+				'value'	=>	1,
 				'info'	=>	'开启SEO优化',
 				'type'	=>	'int',
 			),
@@ -126,8 +126,8 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				'type'	=>	'string',
 			),
 			'debug'	=>	array(
-				'value'	=>	0,
-				'info'	=>	'是否显示出错消息(建议只在多说弹出错误提示时临时开启)',
+				'value'	=>	1,
+				'info'	=>	'是否显示出错消息(仅在多说同步和备份出错时有效)',
 				'type'	=>	'int',
 			)
 		);
@@ -197,7 +197,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		}
 		if(!empty($meta['thread_key'])){
 			$aid = $meta['thread_key'];
-			$sql = "SELECT title FROM #@__archives WHERE id = $aid";
+			$sql = "SELECT typeid, title FROM #@__archives WHERE id = $aid";
 			$thread = $dsql->GetOne($sql);
 			if(is_array($thread)){
 				//注意防止sql注入 title,author_name,message
@@ -208,8 +208,9 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 				$ischeck = self::$approvedMap[$meta['status']];
 				$dtime = strtotime($meta['created_at']);
 				$message = addslashes(iconv("UTF-8","GBK",strip_tags($meta['message'])));
+				$typeId = $thread['typeid'];
 				$sql = "INSERT INTO #@__feedback (aid,typeid,username,arctitle,ip,ischeck,dtime,mid,bad,good,ftype,face,msg) VALUES ("
-				."$threadKey,1,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
+				."$threadKey,$typeId,'$author_name','$title','$ip',$ischeck,'$dtime',1,0,0,'feedback',1,'$message')";
 				$dsql->ExecuteNoneQuery($sql);
 				$last_id = $dsql->GetLastID();
 				$sql = "INSERT INTO duoshuo_commentmeta (post_id,cid) VALUES ($postId,$last_id)";
@@ -397,7 +398,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	
 		$posts = array();
 		$affectedThreads = array();
-		$max_sync_id = 0;
+		$last_log_id = 0;
 	
 		$response = $client->getLogList($params);
 	
@@ -424,17 +425,17 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 
 			$affectedThreads = array_merge($affectedThreads, $affected);
 				
-			if ($log['log_id'] > $max_sync_id)
-				$max_sync_id = $log['log_id'];
+			if (strlen($log['log_id']) > strlen($last_log_id) || strcmp($log['log_id'], $last_log_id) > 0)
+				$last_log_id = $log['log_id'];
 		}
 			
-		$params['since_id'] = $max_sync_id;
+		$params['since_id'] = $last_log_id;
 	
 		//唯一化
 		$aidList = array_unique($affectedThreads);
 	
-		if ($max_sync_id > $last_sync)
-			$this->updateOption('last_sync', $max_sync_id);
+		if ($last_log_id > $last_sync)
+			$this->updateOption('last_sync', $last_log_id);
 	
 		$this->updateOption('sync_lock',  0);
 	
