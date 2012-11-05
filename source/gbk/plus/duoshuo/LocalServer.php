@@ -40,7 +40,7 @@ class Duoshuo_LocalServer{
 		
 		$posts = array();
 		$affectedThreads = array();
-		$max_sync_id = 0;
+		$last_log_id = 0;
 		
 		do{
 			$response = $client->getLogList($params);
@@ -68,19 +68,19 @@ class Duoshuo_LocalServer{
 				
 				$affectedThreads = array_merge($affectedThreads, $affected);
 			
-				if ($log['log_id'] > $max_sync_id)
-					$max_sync_id = $log['log_id'];
+				if (strlen($log['log_id']) > strlen($last_log_id) || strcmp($log['log_id'], $last_log_id) > 0)
+					$last_log_id = $log['log_id'];
 			}
 			
-			$params['since_id'] = $max_sync_id;
+			$params['since_id'] = $last_log_id;
 				
 		} while ($count == $limit);//如果返回和最大请求条数一致，则再取一次
 		
 		//唯一化
 		$aidList = array_unique($affectedThreads);
 				
-		if ($max_sync_id > $last_sync)
-			$this->plugin->updateOption('last_sync', $max_sync_id);
+		if (strlen($last_log_id) > strlen($last_sync) || strcmp($last_log_id, $last_sync) > 0)
+			$this->plugin->updateOption('last_sync', $last_log_id);
 		
 		$this->plugin->updateOption('sync_lock',  0);
 		

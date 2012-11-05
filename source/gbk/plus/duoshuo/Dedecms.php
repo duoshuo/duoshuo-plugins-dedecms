@@ -434,7 +434,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 		//Î¨Ò»»¯
 		$aidList = array_unique($affectedThreads);
 	
-		if ($last_log_id > $last_sync)
+		if (strlen($last_log_id) > strlen($last_sync) || strcmp($last_log_id, $last_sync) > 0)
 			$this->updateOption('last_sync', $last_log_id);
 	
 		$this->updateOption('sync_lock',  0);
