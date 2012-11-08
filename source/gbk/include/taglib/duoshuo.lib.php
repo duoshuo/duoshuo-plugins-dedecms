@@ -28,7 +28,7 @@ function lib_duoshuo(&$ctag,&$refObj)
 		$refObj->Fields['arcurl'] = $refObj->GetTrueUrl(null);
 	}
 	if(strpos($refObj->Fields['arcurl'],$cfg_basehost) === false){
-		$attrs[] = ' data-url="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['arcurl'].'"';
+		$attrs[] = ' data-url="'.$cfg_basehost.$refObj->Fields['arcurl'].'"';
 	}
 	else{
 		$attrs[] = ' data-url="'.$refObj->Fields['arcurl'].'"';
@@ -37,7 +37,7 @@ function lib_duoshuo(&$ctag,&$refObj)
 		if(preg_match('/http:\/\//',$refObj->Fields['litpic'])){
 			$attrs[] = ' data-image="'.$refObj->Fields['litpic'].'"';
 		}else{
-			$attrs[] = ' data-image="'.$cfg_basehost.$cfg_cmspath.$refObj->Fields['litpic'].'"';
+			$attrs[] = ' data-image="'.$cfg_basehost.$refObj->Fields['litpic'].'"';
 		}
 	}
 	
