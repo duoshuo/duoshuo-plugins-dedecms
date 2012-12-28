@@ -6,6 +6,7 @@ require 'EasyHttp/Encoding.php';
 require 'EasyHttp/Fsockopen.php';
 require 'EasyHttp/Proxy.php';
 require 'EasyHttp/Streams.php';
+require 'EasyHttp/Error.php';
 /**
  * 
  * @link http://duoshuo.com/
