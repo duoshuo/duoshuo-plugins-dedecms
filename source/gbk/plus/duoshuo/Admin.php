@@ -4,19 +4,19 @@ class Duoshuo_Admin{
 	
 	function manageComments(){
 		$adminPath = 'admin/';
-		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
+		require DEDEROOT.'/plus/duoshuo/templates/admin.htm';
 	}
 	
 	function adminUsers(){
 		$adminPath = 'admin/users/';
-		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
+		require DEDEROOT.'/plus/duoshuo/templates/admin.htm';
 	}
 	function adminSettings(){
 		$adminPath = 'admin/settings/';
-		require DEDEROOT.'/plus/duoshuo/templets/admin.htm';
+		require DEDEROOT.'/plus/duoshuo/templates/admin.htm';
 	}
 	function localConfig(){
-		require DEDEROOT.'/plus/duoshuo/templets/local_config.htm';
+		require DEDEROOT.'/plus/duoshuo/templates/local_config.htm';
 	}
 	
 	function saveLocalConfig(){
@@ -34,7 +34,7 @@ class Duoshuo_Admin{
 	
 	
 	function helpDocument(){
-		require DEDEROOT.'/plus/duoshuo/templets/help_document.htm';
+		require DEDEROOT.'/plus/duoshuo/templates/help_document.htm';
 	}
 	
 	function replaceCommentTag(){
@@ -77,7 +77,7 @@ class Duoshuo_Admin{
 	}
 	
 	function installStep1(){
-		require DEDEROOT.'/plus/duoshuo/templets/replace_tag.htm';
+		require DEDEROOT.'/plus/duoshuo/templates/replace_tag.htm';
 	}
 
 	function getGlobal($key)
