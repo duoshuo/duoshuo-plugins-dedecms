@@ -47,7 +47,7 @@ function lib_duoshuo(&$ctag,&$refObj)
 	
 	//输出评论框
 	ob_start();
-	require (DEDEROOT.'/plus/duoshuo/templets/comments.htm');
+	require (DEDEROOT.'/plus/duoshuo/templates/comments.htm');
 	
 	if($plugin->getOption('seo_enabled') && !empty($arcid)){
 		// 每篇评论最大字数
@@ -55,7 +55,7 @@ function lib_duoshuo(&$ctag,&$refObj)
 		// 每篇文章seo显示的最大行数
 		$totalrow = 100;
 		
-		$innertext  = file_get_contents(DEDEROOT.'/plus/duoshuo/templets/comments_seo.htm');
+		$innertext  = file_get_contents(DEDEROOT.'/plus/duoshuo/templates/comments_seo.htm');
 
 ?>
 <div id="ds-ssr" class="mt1">
