@@ -167,6 +167,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 			'system'		=>	'dedecms',
 			'callback'		=>	self::currentUrl(),
 			'local_api_url' => $cfg_basehost.$cfg_cmspath.'/plus/duoshuo/api.php',
+			'oauth_proxy_url'=> $cfg_basehost.$cfg_cmspath.'/plus/duoshuo/oauth-proxy.php',
 			'plugin_version' => self::VERSION,
 			'url'			=>	$cfg_basehost.$cfg_cmspath.$cfg_indexurl,
 			'siteurl'		=>	$cfg_basehost.$cfg_cmspath,
@@ -278,7 +279,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 	/**
 	 * 将文章和评论内容同步到多说，用于以前的评论显示和垃圾评论过滤
 	 */
-	public function export(){
+public function export(){
 		global $dsql;
 		
 		@set_time_limit(0);
@@ -302,7 +303,6 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 					while($row = $dsql->GetArray())
 					{
 						$aidArray[] = $row['aid'];
-						
 					}
 					if(count($aidArray)>0){
 						$aids = implode(',', $aidArray);
@@ -316,6 +316,7 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 							$threads[] = $arc->Fields;
 						}
 						$count = $this->exportThreads($threads);
+						$maxid = $aidArray[count($aidArray)-1];
 					}else{
 						$count = 0;
 					} 
@@ -337,12 +338,20 @@ class Duoshuo_Dedecms extends Duoshuo_Abstract{
 						$comments[] = $row;
 					}
 					$count = $this->exportPosts($comments,$cidFromDuoshuo);
+					
 					break;
 				default:
 			}
 			
 			if ($count == $limit){
-				$progress = $type . '/' . ($offset + $limit);
+				switch($type){
+					case 'thread':
+						$progress = $type . '/' . ($maxid);
+						break;
+					case 'post':
+						$progress = $type . '/' . ($offset + $limit);
+						break;
+				}
 			}
 			elseif($type == 'thread')
 				$progress = 'post/0';

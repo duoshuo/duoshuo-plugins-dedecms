@@ -12,17 +12,17 @@
 	}
 	$progress = $duoshuoPlugin->getOption('synchronized');
 		
-	if (!$progress || is_numeric($progress)){//	之前已经完成了导出流程
-		$excuteExportString = "执行同步";
+	if (!$progress || is_numeric($progress)){//	֮ǰ�Ѿ�����˵�������
+		$excuteExportString = "ִ��ͬ��";
 	}else{
-		$excuteExportString = "继续未完成同步";
+		$excuteExportString = "����δ���ͬ��";
 	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
-<title>多说评论管理</title>
+<title>��˵���۹���</title>
 <script language="javascript" src="../plus/duoshuo/js/jquery-1.7.2.min.js"></script>
 <link href="<?php echo CSSPATH;?>/base.css" rel="stylesheet" type="text/css" />
 </head>
@@ -31,7 +31,7 @@
 	<tr>
 		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" style="padding-left:10px;">
 			<div style="float:left">
-				<b>自动替换原始评论框</b>
+				<b>�Զ��滻ԭʼ���ۿ�</b>
 			</div>
 		</td>
 	</tr>
@@ -41,16 +41,16 @@
 				<?php if(!$tag_replaced):?>
 				<form action="duoshuo.php" name="replaceCommentTag" method="post">
 					<input name="action" type="hidden" value="replaceCommentTag"/>
-					如果您未改动过系统模板评论部分，建议使用自动替换。
-					<p>自动替换将会备份/templets/ajaxfeeback.htm为/templets/ajaxfeedback.back.htm，并将<b><?php echo Duoshuo_Dedecms::$commentTag;?> </b>写入新的/templets/ajaxfeeback.htm模板。
+					�����δ�Ķ���ϵͳģ�����۲��֣�����ʹ���Զ��滻��
+					<p>�Զ��滻���ᱸ��/templets/default/ajaxfeedback.htmΪ/templets/default/ajaxfeedback.back.htm������<b><?php echo Duoshuo_Dedecms::$commentTag;?> </b>д���µ�/templets/default/ajaxfeedback.htmģ�塣
 					</p>
 					<p>
-					<input type="button" size="12" onclick="document.replaceCommentTag.submit();" style="width:50px" value="替换" />
+					<input type="button" size="12" onclick="document.replaceCommentTag.submit();" style="width:50px" value="�滻" />
 					</p>
 				</form>
 				<?php else:?>
-					检测到自动替换已经生效，如使用静态HTML文档，需先 [<a target="main" href="makehtml_archives.php"><u>更新文档HTML</u></a>] 之后，以前的文章才会显示多说评论框。
-					<p>自动替换已经将/templets/ajaxfeeback.htm备份为/templets/ajaxfeedback.back.htm，并将<b><?php echo Duoshuo_Dedecms::$commentTag;?> </b>写入新的/templets/ajaxfeeback.htm模板。</p>
+					��⵽�Զ��滻�Ѿ���Ч����ʹ�þ�̬HTML�ĵ������� [<a target="main" href="makehtml_archives.php"><u>�����ĵ�HTML</u></a>] ֮����ǰ�����²Ż���ʾ��˵���ۿ�
+					<p>�Զ��滻�Ѿ���/templets/default/ajaxfeedback.htm����Ϊ/templets/default/ajaxfeedback.back.htm������<b><?php echo Duoshuo_Dedecms::$commentTag;?> </b>д���µ�/templets/default/ajaxfeedback.htmģ�塣</p>
 					
 				<?php endif;?>
 			</div>
@@ -59,7 +59,7 @@
 	<tr>
 		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" style="padding-left:10px;">
 			<div style="float:left">
-				<b>如果自动替换原始评论框无效或需要手动插入评论框</b>
+				<b>����Զ��滻ԭʼ���ۿ���Ч����Ҫ�ֶ��������ۿ�</b>
 			</div>
 		</td>
 	</tr>
@@ -67,9 +67,9 @@
 		<td style="padding-left:10px;">
 			<div style="float:left">
 				<?php if($tag_replaced):?>
-				<p>检测到自动替换已经生效，如果您的文章页仍未显示评论框，请先更新静态文档，再考虑手动替换。</p>
+				<p>��⵽�Զ��滻�Ѿ���Ч�������������ҳ��δ��ʾ���ۿ����ȸ��¾�̬�ĵ����ٿ����ֶ��滻��</p>
 				<?php endif;?>
-				<p>如果您更改过系统模板评论部分，或需要在文章页中其他位置使用评论框。只需在文章模板相应位置插入 <b><?php echo Duoshuo_Dedecms::$commentTag;?></b>
+				<p>��������Ĺ�ϵͳģ�����۲��֣�����Ҫ������ҳ������λ��ʹ�����ۿ�ֻ��������ģ����Ӧλ�ò��� <b><?php echo Duoshuo_Dedecms::$commentTag;?></b>
 				</p>
 			</div>
 		</td>
@@ -79,26 +79,26 @@
 	<tr>
 		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" colspan="2" style="padding-left:10px;">
 			<div style="float:left">
-				<b>同步</b>
+				<b>ͬ��</b>
 			</div>
 		</td>
 	</tr>
 	<tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-		<td width="215px" align="right">同步本地数据到多说</td>
+		<td width="215px" align="right">ͬ���������ݵ���˵</td>
 		<td align="left" id="ds-export">
 			<span class="message-start"><input type="button" size="14" onclick="fireExport();return false;" value="<?php echo $excuteExportString;?>"></span>
 			<span class="status"></span>
-			<span class="message-complete">同步完成</span>
-			<span class="help-inline">同步后能显示原有评论。同步包含：原有评论数据，与评论相关的文章数据。</span>
+			<span class="message-complete">ͬ�����</span>
+			<span class="help-inline">ͬ��������ʾԭ�����ۡ�ͬ��������ԭ���������ݣ���������ص��������ݡ�</span>
 		</td>
 	</tr>
 	<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-		<td width="215px" align="right">备份多说中的评论到本地数据库</td>
+		<td width="215px" align="right">���ݶ�˵�е����۵��������ݿ�</td>
 		<td align="left" id="ds-sync">
-			<span class="message-start"><input type="button" size="14" onclick="fireSyncLog();return false;" value="执行备份"></input></span>
+			<span class="message-start"><input type="button" size="14" onclick="fireSyncLog();return false;" value="ִ�б���"></input></span>
 			<span class="status"></span>
-			<span class="message-complete">备份完成</span>
-			<span class="help-inline">插件开启了自动备份功能，仅当自动备份不正常时，需要执行手动备份。</span>
+			<span class="message-complete">�������</span>
+			<span class="help-inline">����������Զ����ݹ��ܣ������Զ����ݲ�����ʱ����Ҫִ���ֶ����ݡ�</span>
 		</td>
 	</tr>
 </table>
@@ -106,26 +106,26 @@
 	<tr>
 		<td height="28" background="<?php echo IMAGEPATH;?>/tbg.gif" colspan="2" style="padding-left:10px;">
 			<div style="float:left">
-				<b>本地设置</b>
+				<b>��������</b>
 			</div>
 		</td>
 	</tr>
 	<form action="duoshuo.php" name="localConfig" method="post">
 		<input name="action" type="hidden" value="saveLocalConfig"/>
 		<tr bgcolor="#FFFFFF" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-			<td width="215px" align="right">开启后台出错时显示错误内容</td>
+			<td width="215px" align="right">������̨����ʱ��ʾ��������</td>
 			<td align="left">
 			<input class="np" type="hidden" name="debug" value="0" />
-			<input class="np" type="checkbox" <?php echo $duoshuoPlugin->getOption('debug')? "checked='checked'" : ''; ?> name="debug" value="1" /><span class="help-inline">该功能仅在多说同步和备份出错时有效</span></td>
+			<input class="np" type="checkbox" <?php echo $duoshuoPlugin->getOption('debug')? "checked='checked'" : ''; ?> name="debug" value="1" /><span class="help-inline">�ù��ܽ��ڶ�˵ͬ���ͱ��ݳ���ʱ��Ч</span></td>
 		</tr>
 		<tr bgcolor="#FDFCFA" align="center" height="26" onmouseout="javascript:this.bgColor='#FDFCFA';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-			<td width="215px" align="right">开启SEO优化</td>
+			<td width="215px" align="right">����SEO�Ż�</td>
 			<td align="left">
 			<input class="np" type="hidden" name="seo_enabled" value="0" />
 			<input class="np" type="checkbox" <?php echo $duoshuoPlugin->getOption('seo_enabled')? "checked='checked'" : ''; ?> name="seo_enabled" value="1" /></td>
 		</tr>
 		<tr bgcolor="#FFFFFF" height="26" onmouseout="javascript:this.bgColor='#FFFFFF';" onmousemove="javascript:this.bgColor='#FCFDEE';">
-			<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="保存设置" /></td>
+			<td align="left" colspan="2" style="padding-left:225px"><input type="button" size="14" onclick="document.localConfig.submit();" style="width:60px" value="��������" /></td>
 		</tr>
 	</form>
 	<?php include_once dirname(__FILE__) . '/common-script.htm';?>

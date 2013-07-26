@@ -9,6 +9,7 @@
  */
 
 require_once(dirname(__FILE__)."/config.php");
+@ini_set('display_errors', 1);
 require_once(DEDEINC."/json.class.php");
 require_once(DEDEINC.'/arc.archives.class.php');
 
