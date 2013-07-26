@@ -27,18 +27,13 @@ function lib_duoshuo(&$ctag,&$refObj)
 	if(empty($refObj->Fields['arcurl'])){
 		$refObj->Fields['arcurl'] = $refObj->GetTrueUrl(null);
 	}
-	if(strpos($refObj->Fields['arcurl'],$cfg_basehost) === false){
+	/*if(strpos($refObj->Fields['arcurl'],$cfg_basehost) === false){
 		$attrs[] = ' data-url="'.$cfg_basehost.$refObj->Fields['arcurl'].'"';
-	}
-	else{
-		$attrs[] = ' data-url="'.$refObj->Fields['arcurl'].'"';
-	}
+	}*/
+	$attrs[] = ' data-url="'.$refObj->Fields['arcurl'].'"';
+	
 	if(!empty($refObj->Fields['litpic']) && !preg_match('/\/images\/defaultpic.gif/',$refObj->Fields['litpic'])){
-		if(preg_match('/http:\/\//',$refObj->Fields['litpic'])){
-			$attrs[] = ' data-image="'.$refObj->Fields['litpic'].'"';
-		}else{
-			$attrs[] = ' data-image="'.$cfg_basehost.$refObj->Fields['litpic'].'"';
-		}
+		$attrs[] = ' data-image="'.$refObj->Fields['litpic'].'"';
 	}
 	
 	if(!empty($refObj->Fields['title'])){
